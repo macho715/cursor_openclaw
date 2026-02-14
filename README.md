@@ -28,7 +28,7 @@
 - **역할**: Cursor = Control-Plane(APPLY/테스트/커밋/PR/머지), OpenClaw = Worker(diff·patch 제안만), Operator = 최종 승인·STOP 해제.
 - **Queue**: `.autodev_queue/` — inbox → claimed → work → pr → done(정상), blocked(격리), audit(감사로그), STOP(킬스위치).
 - **Gate**: G0(STOP) ~ G6(append-only) + REMOTE_GATE; Decision = AUTO_MERGE / PR_ONLY / ZERO_STOP.
-- 상세: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [AGENTS.md](AGENTS.md) 참조.
+- 상세: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [AGENTS.md](./AGENTS.md) 참조.
 
 ---
 
@@ -87,7 +87,7 @@
 
 ## 로드맵
 
-Prepare → Pilot → Build → Operate → Scale. KPI·기간은 [AGENTS.md](AGENTS.md) §11, [docs/ROADMAP.md](docs/ROADMAP.md) 참조.
+Prepare → Pilot → Build → Operate → Scale. KPI·기간은 [AGENTS.md](./AGENTS.md) §11, [docs/ROADMAP.md](docs/ROADMAP.md) 참조.
 
 ---
 

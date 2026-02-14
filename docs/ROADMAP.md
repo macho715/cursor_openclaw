@@ -14,7 +14,7 @@ Control-Plane Cursor / Worker OpenClaw — Folder Queue Option A
 
 ## 2. 단계별 로드맵
 
-(출처: `AGENTS.md` §11 Roadmap)
+(출처: `../AGENTS.md` §11 Roadmap)
 
 | 단계 | 산출물 | KPI(필수) | 기간(가이드) |
 |------|--------|-----------|--------------|

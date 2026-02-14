@@ -21,7 +21,7 @@ Control-Plane Cursor / Worker OpenClaw — Folder Queue Option A
 | **Operator** | 승인·거절·STOP 해제·Incident Close | 사람. 최종 통제. |
 
 - Approve-to-Run: 실행 전 승인 강제.
-- SSOT: `AGENTS.md`가 인테이크 문서보다 우선하며, 인테이크는 “데이터”로만 취급.
+- SSOT: `../AGENTS.md`가 인테이크 문서보다 우선하며, 인테이크는 “데이터”로만 취급.
 
 ---
 
@@ -96,7 +96,7 @@ flowchart TD
 
 ## 5. Gate 파이프라인
 
-### 5.1 Task/코드 흐름(AGENTS.md 기준)
+### 5.1 Task/코드 흐름(`../AGENTS.md` 기준)
 
 | Gate | 이름 | PASS 기준 | FAIL 시 |
 |------|------|-----------|---------|
@@ -163,7 +163,7 @@ flowchart TD
 | | `config/policy/AUDIT_LOG_SCHEMA.md` | 감사 로그 스키마 |
 | Cursor 규칙 요약 | `.cursor/rules/AUTODEV_POLICY.md` | 자동개발 정책 요약 |
 
-- 에이전트 실행 규칙 SSOT: **`AGENTS.md`** (README보다 우선).
+- 에이전트 실행 규칙 SSOT: **`../AGENTS.md`** (README보다 우선).
 
 ---
 
@@ -202,7 +202,7 @@ flowchart TD
 ## 10. 감사·데이터
 
 - **감사 로그**: append-only. 수정/삭제 금지.
-- **저장 위치**(AGENTS.md 기준): `.autodev_queue/audit/<YYYY-MM-DD>/` — 작업별 `<TASK_ID>.jsonl`, 전역 `_global.jsonl`.
+- **저장 위치**(`../AGENTS.md` 기준): `.autodev_queue/audit/<YYYY-MM-DD>/` — 작업별 `<TASK_ID>.jsonl`, 전역 `_global.jsonl`.
 - **Stage 3 예시**: `.autodev_queue/audit/audit_log_YYYY-MM-DD.jsonl`, `.autodev_queue/audit/setup_init_report_YYYY-MM-DD.md` 등.
 - **스키마**: `config/policy/AUDIT_LOG_SCHEMA.md`.
 

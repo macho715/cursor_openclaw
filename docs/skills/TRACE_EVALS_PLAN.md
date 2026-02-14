@@ -7,7 +7,7 @@
 - gate_fail_top = 가장 많이 실패한 gate_id Top N
 - latency_ms(단계별): stop-check, queue-scan, diff-risk-scan, gate-runner 등
 - drift_watch:
-  - 정책/규정/SSOT 변경 감지(AGENTS.md, allowlist, audit schema 변경 시)
+  - 정책/규정/SSOT 변경 감지(`../../AGENTS.md`, allowlist, audit schema 변경 시)
 
 ## 2) 감사로그(append-only) 요구 필드(최소)
 - timestamp, event_id, prev_event_id

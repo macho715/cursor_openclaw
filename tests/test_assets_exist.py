@@ -19,3 +19,15 @@ REQUIRED = [
 def test_assets_exist():
     missing = [p for p in REQUIRED if not Path(p).exists()]
     assert not missing, f"Missing: {missing}"
+
+
+SSOT_CANDIDATES = [
+    'AGENTS.md',
+    'config/policy/CURSOR_RULES.md',
+]
+
+
+def test_ssot_reference_exists():
+    assert any(Path(p).exists() for p in SSOT_CANDIDATES), (
+        f"Missing SSOT reference candidates: {SSOT_CANDIDATES}"
+    )
