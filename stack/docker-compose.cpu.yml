@@ -1,0 +1,10 @@
+# CPU-only ollama (no GPU) - use when GPU fails in Docker:
+#   docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d ollama
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations: {}
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=
+      - OLLAMA_NUM_PARALLEL=1

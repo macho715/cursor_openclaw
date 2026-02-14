@@ -36,6 +36,7 @@
 
 | 문서 | 용도 |
 |------|------|
+| [docs/INDEX.md](docs/INDEX.md) | 전체 문서 마스터 네비게이션(역할별 읽기 경로) |
 | `AGENTS.md` | 에이전트 실행 규칙 SSOT(README보다 우선) |
 | `MANIFEST.json` | 프로젝트명, stage_current/stage_next, baton_file |
 | `BATON_CURRENT.md` | 현재 Stage 요약(예: Stage 3 → 4) |
@@ -43,6 +44,9 @@
 | `config/uiux/*.md` | UX_FLOW, SCREENS, INPUT_GUARD, A11Y_DoD, COPY, COMPONENTS |
 | `.cursor/rules/AUTODEV_POLICY.md` | Cursor 규칙 요약 |
 | `.cursor/commands/*.md` | /setup:init, /queue:claim, /queue:open-plan, /queue:request-patch-draft, /queue:run-gates, /queue:decide, /queue:pr-merge, /incident:recover |
+| `docs/STACK_SESSION_REPORT.md` | 스택(ollama/openclaw) 작업 이력 |
+| `stack/RUNBOOK.md` | 스택 Phase 1~3 실행·롤백·진단 |
+| `stack/NEXT_STEPS.md` | 스택 기동 후 작업(모델 pull, Grafana) |
 
 ---
 
@@ -70,6 +74,8 @@
 | `.autodev_queue/` | Folder Queue(inbox/claimed/work/pr/done/blocked/audit, STOP) |
 | `.cursor/` | rules, commands, skills, agents, config |
 | `config/` | policy, uiux, project_profile 등 |
+| `docs/` | ARCHITECTURE, ROADMAP, INDEX(마스터 네비게이션), 스택 보고서 등 |
+| `stack/` | RUNBOOK, NEXT_STEPS, docker-compose |
 | `tools/` | 스크립트(예: init_autodev_queue) |
 | `tests/` | 테스트 |
 
