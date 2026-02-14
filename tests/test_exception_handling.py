@@ -33,7 +33,7 @@ def test_require_no_stop_handles_transition_error_and_logs_audit(
     task_id = "T100"
     task_dir = _mk_task(qp, QueueState.WORK, task_id)
     (task_dir / "STOP").write_text("STOP\n", encoding="utf-8")
-    audit = AuditLogger(task_dir / "audit" / "audit.log.jsonl")
+    audit = AuditLogger(qp.root / "audit" / f"{task_id}.jsonl")
 
     def _raise_transition(*args: Any, **kwargs: Any) -> None:
         raise TransitionError("INVALID_TRANSITION: work -> blocked")
@@ -79,7 +79,7 @@ def test_cmd_block_handles_transition_error_and_surfaces_unexpected(
     monkeypatch.setattr("tools.cli.move_task", _raise_transition)
     assert cmd_block(args) == 0
 
-    audit_path = task_dir / "audit" / "audit.log.jsonl"
+    audit_path = qp.root / "audit" / f"{task_id}.jsonl"
     records = [
         json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()
     ]
@@ -99,18 +99,17 @@ def test_decide_handles_transition_error_and_surfaces_unexpected(
     task_id = "T103"
     task_dir = _mk_task(qp, QueueState.WORK, task_id)
     (task_dir / "STOP").write_text("STOP\n", encoding="utf-8")
-    audit = AuditLogger(task_dir / "audit" / "audit.log.jsonl")
+    audit_path = qp.root / "audit" / f"{task_id}.jsonl"
 
     def _raise_transition(*args: Any, **kwargs: Any) -> None:
         raise TransitionError("INVALID_TRANSITION: work -> blocked")
 
     monkeypatch.setattr("src.queue.decision.move_task", _raise_transition)
-    decision = decide(task_id, audit=audit, qp=qp)
+    decision = decide(task_id, qp=qp)
     assert decision.decision == "ZERO_STOP"
 
     records = [
-        json.loads(line)
-        for line in audit.log_path.read_text(encoding="utf-8").splitlines()
+        json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()
     ]
     assert records[-2]["event"] == "DECIDE_BLOCK_MOVE_SKIPPED"
     assert records[-1]["event"] == "DECIDE"
@@ -120,4 +119,4 @@ def test_decide_handles_transition_error_and_surfaces_unexpected(
 
     monkeypatch.setattr("src.queue.decision.move_task", _raise_runtime_error)
     with pytest.raises(RuntimeError, match="boom"):
-        decide(task_id, audit=audit, qp=qp)
+        decide(task_id, qp=qp)

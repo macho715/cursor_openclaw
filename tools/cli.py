@@ -87,7 +87,9 @@ def cmd_decide(args: argparse.Namespace) -> int:
     qp = _qp()
     d = decide(args.task, qp=qp)
     _, task_dir = qp.find_task(args.task)
-    (task_dir / "artifacts" / "decision.json").write_text(
+    artifacts_dir = task_dir / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    (artifacts_dir / "decision.json").write_text(
         json.dumps({"decision": d.decision, "reason": d.reason}, indent=2),
         encoding="utf-8",
     )
