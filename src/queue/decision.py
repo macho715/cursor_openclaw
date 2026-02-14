@@ -18,16 +18,28 @@ class Decision:
     reason: str
 
 
-def decide(task_id: str, audit: AuditLogger, qp: QueuePaths | None = None) -> Decision:
+def _audit(qp: QueuePaths, task_id: str) -> AuditLogger:
+    return AuditLogger(qp.root / "audit" / f"{task_id}.jsonl")
+
+
+def _append_decision_log(qp: QueuePaths, task_id: str, decision: DecisionType, reason: str) -> None:
+    # Re-check current task location so logging stays consistent after move_task calls.
+    qp.find_task(task_id)
+    _audit(qp, task_id).append_event(
+        {"task_id": task_id, "event": "DECIDE", "decision": decision, "reason": reason}
+    )
+
+
+def decide(task_id: str, qp: QueuePaths | None = None) -> Decision:
     qp = qp or QueuePaths()
-    st, task_dir = qp.find_task(task_id)
+    _, task_dir = qp.find_task(task_id)
 
     if has_stop(task_dir):
         try:
             move_task(task_id, QueueState.BLOCKED, qp=qp)
         except Exception:
             pass
-        audit.append_event({"task_id": task_id, "event": "DECIDE", "decision": "ZERO_STOP", "reason": "STOP_DETECTED"})
+        _append_decision_log(qp, task_id, "ZERO_STOP", "STOP_DETECTED")
         return Decision(decision="ZERO_STOP", reason="STOP_DETECTED")
 
     try:
@@ -38,7 +50,7 @@ def decide(task_id: str, audit: AuditLogger, qp: QueuePaths | None = None) -> De
             move_task(task_id, QueueState.BLOCKED, qp=qp)
         except Exception:
             pass
-        audit.append_event({"task_id": task_id, "event": "DECIDE", "decision": "ZERO_STOP", "reason": str(e)})
+        _append_decision_log(qp, task_id, "ZERO_STOP", str(e))
         return Decision(decision="ZERO_STOP", reason=str(e))
 
     if not gate_passed(results):
@@ -46,9 +58,9 @@ def decide(task_id: str, audit: AuditLogger, qp: QueuePaths | None = None) -> De
             move_task(task_id, QueueState.BLOCKED, qp=qp)
         except Exception:
             pass
-        audit.append_event({"task_id": task_id, "event": "DECIDE", "decision": "ZERO_STOP", "reason": "GATE_FAILED"})
+        _append_decision_log(qp, task_id, "ZERO_STOP", "GATE_FAILED")
         return Decision(decision="ZERO_STOP", reason="GATE_FAILED")
 
     # Stage4: never actually merge; default PR_ONLY
-    audit.append_event({"task_id": task_id, "event": "DECIDE", "decision": "PR_ONLY", "reason": "GATES_OK"})
+    _append_decision_log(qp, task_id, "PR_ONLY", "GATES_OK")
     return Decision(decision="PR_ONLY", reason="GATES_OK")
