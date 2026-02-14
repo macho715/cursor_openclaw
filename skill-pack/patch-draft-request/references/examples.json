@@ -1,0 +1,49 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "patch-draft-request",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "OpenClaw draft patch 수신 완료.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-DRAFT", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "request_id": "REQ-0001",
+      "producer": "OPENCLAW",
+      "draft_patch_path": ".autodev_queue/work/TASK-0001/draft.patch",
+      "rationale_path": ".autodev_queue/work/TASK-0001/rationale.md"
+    }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "patch-draft-request",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "Draft patch 생성 실패(빈 결과).",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-DRAFT", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "request_id": "REQ-0001",
+      "producer": "OPENCLAW",
+      "draft_patch_path": "",
+      "rationale_path": "",
+      "notes": "empty output"
+    }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "patch-draft-request",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "WRITE 승인 미확보로 draft 저장 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-DRAFT", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "request_id": "REQ-0001", "producer": "OPENCLAW", "draft_patch_path": "", "rationale_path": "" }
+  }
+}

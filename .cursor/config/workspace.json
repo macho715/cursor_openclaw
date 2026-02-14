@@ -1,0 +1,24 @@
+{
+  "openOnStart": [
+    "README.md",
+    "config/policy/CURSOR_RULES.md",
+    "config/uiux/SCREENS.md",
+    "plan.md"
+  ],
+  "terminals": {
+    "shortcuts": [
+      {
+        "name": "init-queue (dry-run)",
+        "cmd": "python tools/init_autodev_queue.py --dry-run"
+      },
+      {
+        "name": "pre-commit",
+        "cmd": "pre-commit run --all-files"
+      },
+      {
+        "name": "pytest",
+        "cmd": "pytest -q"
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "gate_id": "G0",
+    "passed": true,
+    "reason": "OK"
+  },
+  {
+    "gate_id": "G1",
+    "passed": true,
+    "reason": "OK"
+  },
+  {
+    "gate_id": "G2",
+    "passed": true,
+    "reason": "OK"
+  },
+  {
+    "gate_id": "G3",
+    "passed": true,
+    "reason": "OK"
+  },
+  {
+    "gate_id": "G4",
+    "passed": true,
+    "reason": "OK"
+  },
+  {
+    "gate_id": "G5",
+    "passed": true,
+    "reason": "OK"
+  },
+  {
+    "gate_id": "G6",
+    "passed": true,
+    "reason": "OK"
+  }
+]

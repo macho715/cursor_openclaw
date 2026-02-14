@@ -1,0 +1,10 @@
+
+---
+description: "Bind UX contract(S1~S7) + WCAG 2.2 AA DoD"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+- S1~S7 화면 책임/CTA/가드 변경 금지
+- Input Guard 미충족 시 진행 불가
+- A11y DoD는 config/uiux/A11Y_DoD.md 준수

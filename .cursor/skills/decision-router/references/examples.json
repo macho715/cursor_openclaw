@@ -1,0 +1,40 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "decision-router",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "decision": "PR_ONLY",
+    "summary": "Gate PASS이나 risk=MEDIUM → PR_ONLY.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "pr" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-DECIDE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "decision": "PR_ONLY", "next": { "skill": "pr-merge-orchestrator", "note": "PR 생성 경로" }, "reasoning": ["risk not LOW"] }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "decision-router",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "decision": "ZERO_STOP",
+    "summary": "정책 위반 신호로 ZERO_STOP.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-DECIDE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "decision": "ZERO_STOP", "next": { "skill": "incident-brief", "note": "S7 수렴" }, "reasoning": ["allowlist/delete/external detected"] }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "decision-router",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "READ 승인 미확보로 결정 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-DECIDE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "decision": "PR_ONLY", "next": { "skill": "incident-brief", "note": "승인 필요" }, "reasoning": ["approval required"] }
+  }
+}

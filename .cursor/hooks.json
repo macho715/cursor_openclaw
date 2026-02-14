@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "limits": {
+    "max_iterations": 3
+  },
+  "policies": {
+    "destructive_actions": "deny_by_default",
+    "require_approval": true
+  },
+  "hooks": [
+    {
+      "id": "stop-killswitch-watch",
+      "when": "file_exists",
+      "path": ".autodev_queue/STOP",
+      "action": {
+        "type": "route",
+        "target": "incident-stop"
+      },
+      "max_runs": 1
+    }
+  ]
+}

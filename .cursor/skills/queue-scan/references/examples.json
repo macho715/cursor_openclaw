@@ -1,0 +1,41 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "queue-scan",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "Queue 스캔 완료.",
+    "task": { "task_id": "NA", "queue_root": ".autodev_queue", "state_before": "unknown", "state_after": "unknown" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-SCAN", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "counts": { "inbox": 1, "claimed": 0, "work": 0, "pr": 0, "done": 0, "blocked": 0 },
+      "tasks": [{ "task_id": "TASK-0001", "state": "inbox", "path": ".autodev_queue/inbox/TASK-0001" }]
+    }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "queue-scan",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "Queue 스캔 실패(경로 접근 오류).",
+    "task": { "task_id": "NA", "queue_root": ".autodev_queue", "state_before": "unknown", "state_after": "unknown" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-SCAN", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "counts": { "inbox": 0, "claimed": 0, "work": 0, "pr": 0, "done": 0, "blocked": 0 }, "tasks": [] }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "queue-scan",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "READ 승인 미확보로 스캔 거절.",
+    "task": { "task_id": "NA", "queue_root": ".autodev_queue", "state_before": "unknown", "state_after": "unknown" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-SCAN", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "counts": { "inbox": 0, "claimed": 0, "work": 0, "pr": 0, "done": 0, "blocked": 0 }, "tasks": [] }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "gate-runner",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "G1~G6 all PASS.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "EXEC", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-GATE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "all_pass": true, "gates": [{ "gate_id": "G1", "status": "PASS", "evidence_paths": [".autodev_queue/work/TASK-0001/evidence/G1.log"] }] }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "gate-runner",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "Gate FAIL 감지.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "EXEC", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-GATE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "all_pass": false, "gates": [{ "gate_id": "G3", "status": "FAIL", "evidence_paths": [".autodev_queue/work/TASK-0001/evidence/G3.log"] }] }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "gate-runner",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "EXEC 승인 미확보로 gate 실행 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "EXEC", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-GATE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "all_pass": false, "gates": [] }
+  }
+}

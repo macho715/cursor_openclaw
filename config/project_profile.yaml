@@ -1,0 +1,24 @@
+
+project:
+  topic: "Cursor(Control-Plane) + OpenClaw(Worker) 무인 자동개발 UI/UX 고정 (Option A, Folder Queue)"
+  timezone: "Asia/Dubai"
+  stage:
+    current: 3
+    next: 4
+  queue:
+    root: ".autodev_queue"
+    states: ["inbox", "claimed", "work", "pr", "done", "blocked", "audit"]
+    stop_path: ".autodev_queue/STOP"
+  gates:
+    max_lines: 300.00
+    allow_delete: false
+    allow_lockfile: false
+    require_commands_pass: true
+    require_dryrun_apply_match: true
+  roles:
+    cursor_owns: ["APPLY", "TEST", "COMMIT", "PR", "MERGE"]
+    openclaw_can: ["PROPOSE_PATCH_ONLY"]
+  external_io:
+    webchat: "disabled_or_readonly"
+    upload: "deny"
+    notify_operator: "text_only (masking)"

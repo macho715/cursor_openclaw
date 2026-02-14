@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: "HVDC-KPI"
+    orgId: 1
+    folder: "HVDC"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

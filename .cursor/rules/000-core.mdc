@@ -1,0 +1,13 @@
+
+---
+description: "Core SSOT + Scope Guard + Patch-only + Approve-to-Run"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+- SSOT: `config/policy/*`, `config/uiux/*`, `MANIFEST.json`, `BATON_CURRENT.md`
+- Stage Guard: stage_current=3에서는 **설정/스펙만**(구현 금지)
+- 권한: OpenClaw=제안만, Cursor=APPLY/TEST/COMMIT/PR/MERGE 소유
+- 흐름: DRY_RUN → Diff → Gate → Decision → APPLY
+- STOP: `.autodev_queue/STOP` 존재 시 ZERO_STOP
+- allowlist: `.cursor/`, `.github/`, `config/`, `docs/`, `tools/`, `tests/`, `pyproject.toml`, `plan.md`, `CODEOWNERS`, `README.md`, `CHANGELOG.md`, `MANIFEST.json`, `BATON_CURRENT.md`, `AGENTS.md`

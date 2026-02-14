@@ -1,0 +1,203 @@
+version: "3.9"
+
+networks:
+  llmnet:
+
+volumes:
+  ollama-data:
+  openclaw-data:
+  tg-data:
+  wa-session:
+  prometheus-data:
+  grafana-data:
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT}:11434"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - OLLAMA_NUM_PARALLEL=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    volumes:
+      - ollama-data:/root/.ollama
+    networks: [llmnet]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:11434/api/tags >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  openclaw:
+    build: ./openclaw-stub
+    image: openclaw-stub:latest
+    container_name: openclaw
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+    ports:
+      - "${OPENCLAW_PORT}:50051"
+      - "${OPENCLAW_HTTP_PORT}:8088"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=exaone3.5:7.8b
+      - OLLAMA_CONTEXT_LENGTH=4096
+    deploy:
+      resources:
+        limits:
+          cpus: "2.00"
+          memory: 4g
+    volumes:
+      - openclaw-data:/data
+    networks: [llmnet]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8088/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  tg-ingest:
+    profiles: [ingest]
+    build: ./ingest/tg
+    image: hvdc/tg-ingest:latest
+    container_name: tg-ingest
+    restart: unless-stopped
+    depends_on:
+      openclaw:
+        condition: service_healthy
+    environment:
+      - TG_BOT_TOKEN=${TG_BOT_TOKEN}
+      - TG_ALLOWED_CHAT_IDS=${TG_ALLOWED_CHAT_IDS}
+      - OPENCLAW_HTTP=http://openclaw:8088
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1g
+    volumes:
+      - tg-data:/data
+    networks: [llmnet]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /data/ok || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+
+  wa-ingest:
+    profiles: [ingest]
+    build: ./ingest/wa
+    image: hvdc/wa-ingest:latest
+    container_name: wa-ingest
+    restart: unless-stopped
+    depends_on:
+      openclaw:
+        condition: service_healthy
+    environment:
+      - WA_CLIENT_ID=${WA_CLIENT_ID}
+      - WA_ALLOWED_NUMBERS=${WA_ALLOWED_NUMBERS}
+      - OPENCLAW_HTTP=http://openclaw:8088
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1g
+    volumes:
+      - wa-session:/wa/session
+    networks: [llmnet]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /wa/session/ready || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 60s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks: [llmnet]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASS}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    networks: [llmnet]
+
+  cadvisor:
+    profiles: [full]
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks: [llmnet]
+
+  node-exporter:
+    profiles: [full]
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    networks: [llmnet]
+
+  dcgm-exporter:
+    profiles: [full]
+    image: nvidia/dcgm-exporter:latest
+    container_name: dcgm-exporter
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+      - NVIDIA_DRIVER_CAPABILITIES=utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    ports:
+      - "9400:9400"
+    networks: [llmnet]

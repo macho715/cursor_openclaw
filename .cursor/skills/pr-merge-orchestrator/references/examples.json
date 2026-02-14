@@ -1,0 +1,38 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "pr-merge-orchestrator",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "PR_ONLY 실행 계획 산출.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "pr" },
+    "approvals": [{ "tool_class": "PR", "needs_approval": true, "state": "PENDING" }],
+    "audit": { "event_id": "EVT-OK-PRPLAN", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "mode": "PR_ONLY", "plan": ["Create PR", "Run checks", "Request review", "Merge after approval"] }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "pr-merge-orchestrator",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "AUTO_MERGE 조건 미충족으로 계획 중단.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "MERGE", "needs_approval": true, "state": "PENDING" }],
+    "audit": { "event_id": "EVT-FAIL-PRPLAN", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "mode": "AUTO_MERGE", "plan": ["AUTO_MERGE blocked: risk/gate condition not met"] }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "pr-merge-orchestrator",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "PR 승인 미확보로 실행 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "PR", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-PRPLAN", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "mode": "PR_ONLY", "plan": ["Approval required"] }
+  }
+}

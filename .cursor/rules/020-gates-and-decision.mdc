@@ -1,0 +1,18 @@
+
+---
+description: "Gate Pipeline(G0~G6) + Decision Rules"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+- G0 STOP
+- G1 Allowlist
+- G2 Max Lines (add+del ≤ 300.00)
+- G3 No Delete (0.00)
+- G4 No Lockfile/Deps (0.00)
+- G5 Commands PASS
+- G6 DRY_RUN↔APPLY 일치
+
+- AUTO_MERGE: G0~G6 PASS + risk=LOW + 승인
+- PR_ONLY: soft fail(라인/lockfile/테스트)
+- ZERO_STOP: STOP/allowlist 위반/삭제/외부전송/risk=HIGH+핵심 FAIL

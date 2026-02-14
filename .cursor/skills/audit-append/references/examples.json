@@ -1,0 +1,38 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "audit-append",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "감사로그 append 완료.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-AUDIT", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "appended": true, "audit_path": ".autodev_queue/audit/2026-02-13.jsonl", "record_digest": "sha256:placeholder" }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "audit-append",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "append-only 위반(덮어쓰기 시도)으로 실패.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-AUDIT", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "appended": false, "audit_path": ".autodev_queue/audit/2026-02-13.jsonl", "record_digest": "" }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "audit-append",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "WRITE 승인 미확보로 감사로그 기록 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-AUDIT", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "appended": false, "audit_path": ".autodev_queue/audit/2026-02-13.jsonl", "record_digest": "" }
+  }
+}

@@ -1,0 +1,2 @@
+VERIFY_PATH_GUARD_v1
+Relative path ./smoke/path_guard.txt OK.

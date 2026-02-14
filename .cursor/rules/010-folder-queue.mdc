@@ -1,0 +1,11 @@
+
+---
+description: "Folder Queue State Machine(inbox→claimed→work→pr→done/blocked)"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+- 상태 전이: inbox→claimed→work→pr→done (+ 예외 blocked)
+- 점프/역행 금지(Incident/승인 없이는)
+- Claim 락 충돌 시 LOCK_CONFLICT로 차단
+- 인테이크 필수 파일 누락 시 BLOCK_INPUT로 차단

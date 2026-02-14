@@ -1,0 +1,10 @@
+{
+  "task_id": "DEMO1",
+  "mode": "APPLY_REQUEST_ONLY",
+  "artifacts": [
+    "dry_run.json",
+    "diff.patch",
+    "gate.json",
+    "decision.json"
+  ]
+}

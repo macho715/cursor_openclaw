@@ -1,0 +1,38 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "claim-lock",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "Claim/Lock 완료.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "inbox", "state_after": "claimed" },
+    "approvals": [{ "tool_class": "MOVE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-CLAIM", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "result": "CLAIMED", "lock_path": ".autodev_queue/claimed/TASK-0001/.lock" }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "claim-lock",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "LOCK_CONFLICT 발생.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "inbox", "state_after": "inbox" },
+    "approvals": [{ "tool_class": "MOVE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-CLAIM", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "result": "LOCK_CONFLICT", "lock_path": ".autodev_queue/inbox/TASK-0001/.lock", "conflict_owner_hint": "UNKNOWN" }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "claim-lock",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "MOVE 승인 미확보로 Claim 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "inbox", "state_after": "inbox" },
+    "approvals": [{ "tool_class": "MOVE", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-CLAIM", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "result": "DENIED", "lock_path": "" }
+  }
+}

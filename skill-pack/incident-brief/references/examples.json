@@ -1,0 +1,38 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "incident-brief",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "Incident brief 생성 완료.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-INC", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "incident_id": "INC-0001", "severity": "SEV2", "headline": "Gate FAIL", "actions": ["Block task", "Collect evidence"], "recovery_refs": ["R4"] }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "incident-brief",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "Incident brief 작성 실패(경로 오류).",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-INC", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "incident_id": "INC-0001", "severity": "SEV1", "headline": "Policy violation", "actions": ["ZERO_STOP"], "recovery_refs": ["R8"] }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "incident-brief",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "WRITE 승인 미확보로 incident 작성 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "WRITE", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-INC", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "incident_id": "INC-0001", "severity": "SEV3", "headline": "Approval required", "actions": ["Request approval"], "recovery_refs": ["R7"] }
+  }
+}

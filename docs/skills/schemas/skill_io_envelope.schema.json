@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:project_baton_v1:skill_output_envelope:1.0.0",
+  "title": "PROJECT_BATON_v1 Skill Output Envelope",
+  "type": "object",
+  "required": [
+    "schema_id",
+    "schema_version",
+    "skill",
+    "skill_version",
+    "status",
+    "summary",
+    "task",
+    "approvals",
+    "audit",
+    "data"
+  ],
+  "properties": {
+    "schema_id": { "const": "urn:project_baton_v1:skill_output_envelope" },
+    "schema_version": { "const": "1.0.0" },
+    "skill": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "skill_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OK", "FAIL", "DENY", "ZERO_STOP", "PARTIAL"]
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["AUTO_MERGE", "PR_ONLY", "ZERO_STOP", "NA"],
+      "default": "NA"
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "task": {
+      "type": "object",
+      "required": ["task_id", "queue_root", "state_before", "state_after"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "queue_root": { "const": ".autodev_queue" },
+        "state_before": {
+          "type": "string",
+          "enum": ["inbox", "claimed", "work", "pr", "done", "blocked", "unknown"]
+        },
+        "state_after": {
+          "type": "string",
+          "enum": ["inbox", "claimed", "work", "pr", "done", "blocked", "unknown"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "signals": {
+      "type": "object",
+      "required": ["stop_detected", "allowlist_violation", "external_io_attempt", "delete_detected"],
+      "properties": {
+        "stop_detected": { "type": "boolean" },
+        "allowlist_violation": { "type": "boolean" },
+        "external_io_attempt": { "type": "boolean" },
+        "delete_detected": { "type": "boolean" },
+        "lockfile_touched": { "type": "boolean" },
+        "protected_zone_touched": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "code", "message"],
+        "properties": {
+          "severity": { "type": "string", "enum": ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+          "code": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 },
+          "evidence_paths": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "path"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "QUEUE_SNAPSHOT",
+              "LOCK_FILE",
+              "DRAFT_PATCH",
+              "DIFF_SUMMARY",
+              "GATE_EVIDENCE",
+              "PR_LINK",
+              "AUDIT_LOG",
+              "INCIDENT_REPORT",
+              "OTHER"
+            ]
+          },
+          "path": { "type": "string", "minLength": 1 },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tool_class", "needs_approval", "state"],
+        "properties": {
+          "tool_class": {
+            "type": "string",
+            "enum": ["READ", "WRITE", "MOVE", "EXEC", "PR", "MERGE", "EXTERNAL", "COSTLY"]
+          },
+          "needs_approval": { "type": "boolean" },
+          "state": { "type": "string", "enum": ["PENDING", "APPROVED", "DENIED", "NOT_REQUIRED"] },
+          "approved_by": { "type": "string" },
+          "approved_at": { "type": "string", "format": "date-time" },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "audit": {
+      "type": "object",
+      "required": ["event_id", "append_only_path"],
+      "properties": {
+        "event_id": { "type": "string", "minLength": 1 },
+        "append_only_path": { "type": "string", "minLength": 1 },
+        "prev_event_id": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "data": { "type": "object" }
+  },
+  "unevaluatedProperties": false
+}

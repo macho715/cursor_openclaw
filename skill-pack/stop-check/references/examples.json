@@ -1,0 +1,39 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "stop-check",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "STOP 신호 없음. 진행 가능.",
+    "task": { "task_id": "NA", "queue_root": ".autodev_queue", "state_before": "unknown", "state_after": "unknown" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-STOP", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "stop_detected": false, "stop_paths": [], "action": "CONTINUE" }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "stop-check",
+    "skill_version": "1.0.0",
+    "status": "ZERO_STOP",
+    "decision": "ZERO_STOP",
+    "summary": "STOP 감지. blocked 격리 필요.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "inbox", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "MOVE", "needs_approval": true, "state": "PENDING" }],
+    "audit": { "event_id": "EVT-FAIL-STOP", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "stop_detected": true, "stop_paths": [".autodev_queue/STOP"], "action": "MOVE_TO_BLOCKED" }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "stop-check",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "READ 승인 미확보로 STOP 검사 거절.",
+    "task": { "task_id": "NA", "queue_root": ".autodev_queue", "state_before": "unknown", "state_after": "unknown" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-STOP", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "stop_detected": false, "stop_paths": [], "action": "ZERO_STOP" }
+  }
+}

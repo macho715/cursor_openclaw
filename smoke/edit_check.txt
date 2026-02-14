@@ -1,0 +1,4 @@
+VERIFY_EDIT_PATH_REQUIRED_v1
+Created by smoke test.
+Edited with path param (simulated).
+Edited with path param (simulated).

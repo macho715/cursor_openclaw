@@ -1,0 +1,46 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "intake-validate",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "Intake 검증 PASS.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "claimed", "state_after": "work" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-INTAKE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "is_valid": true,
+      "checks": [{ "check_id": "REQUIRED_FILES", "status": "PASS" }, { "check_id": "ALLOWLIST", "status": "PASS" }],
+      "blocked_reason_codes": []
+    }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "intake-validate",
+    "skill_version": "1.0.0",
+    "status": "FAIL",
+    "summary": "Intake 검증 FAIL(Protected Zone).",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "claimed", "state_after": "blocked" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-INTAKE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "is_valid": false,
+      "checks": [{ "check_id": "PROTECTED_ZONE", "status": "FAIL", "note": "SSOT protected hit" }],
+      "blocked_reason_codes": ["PROTECTED_ZONE_TOUCHED"]
+    }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "intake-validate",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "READ 승인 미확보로 Intake 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "claimed", "state_after": "claimed" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-INTAKE", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": { "is_valid": false, "checks": [], "blocked_reason_codes": ["APPROVAL_REQUIRED"] }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "ok": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "diff-risk-scan",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "Diff risk LOW.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-OK-RISK", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "risk_level": "LOW",
+      "diff_stats": { "files_changed": 1, "insertions": 10, "deletions": 0 },
+      "policy_flags": {
+        "delete_detected": false,
+        "lockfile_touched": false,
+        "protected_zone_touched": false,
+        "allowlist_violation": false,
+        "external_io_attempt": false
+      },
+      "reasons": ["no delete/no protected/no external"]
+    }
+  },
+  "fail": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "diff-risk-scan",
+    "skill_version": "1.0.0",
+    "status": "OK",
+    "summary": "Diff risk CRITICAL(delete detected).",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "APPROVED" }],
+    "audit": { "event_id": "EVT-FAIL-RISK", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "risk_level": "CRITICAL",
+      "diff_stats": { "files_changed": 1, "insertions": 0, "deletions": 12 },
+      "policy_flags": {
+        "delete_detected": true,
+        "lockfile_touched": false,
+        "protected_zone_touched": false,
+        "allowlist_violation": false,
+        "external_io_attempt": false
+      },
+      "reasons": ["delete detected => ZERO_STOP candidate"]
+    }
+  },
+  "deny": {
+    "schema_id": "urn:project_baton_v1:skill_output_envelope",
+    "schema_version": "1.0.0",
+    "skill": "diff-risk-scan",
+    "skill_version": "1.0.0",
+    "status": "DENY",
+    "summary": "READ 승인 미확보로 diff 스캔 거절.",
+    "task": { "task_id": "TASK-0001", "queue_root": ".autodev_queue", "state_before": "work", "state_after": "work" },
+    "approvals": [{ "tool_class": "READ", "needs_approval": true, "state": "DENIED" }],
+    "audit": { "event_id": "EVT-DENY-RISK", "append_only_path": ".autodev_queue/audit/2026-02-13.jsonl" },
+    "data": {
+      "risk_level": "HIGH",
+      "diff_stats": { "files_changed": 0, "insertions": 0, "deletions": 0 },
+      "policy_flags": {
+        "delete_detected": false,
+        "lockfile_touched": false,
+        "protected_zone_touched": false,
+        "allowlist_violation": false,
+        "external_io_attempt": false
+      },
+      "reasons": ["approval required"]
+    }
+  }
+}

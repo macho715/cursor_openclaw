@@ -1,0 +1,331 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:project_baton_v1:skill_outputs:1.0.0",
+  "title": "PROJECT_BATON_v1 Skill Outputs (union)",
+  "oneOf": [
+    {
+      "title": "stop-check output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "stop-check" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["stop_detected", "stop_paths", "action"],
+              "properties": {
+                "stop_detected": { "type": "boolean" },
+                "stop_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                "action": { "type": "string", "enum": ["CONTINUE", "ZERO_STOP", "MOVE_TO_BLOCKED"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "queue-scan output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "queue-scan" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["counts", "tasks"],
+              "properties": {
+                "counts": {
+                  "type": "object",
+                  "required": ["inbox", "claimed", "work", "pr", "done", "blocked"],
+                  "properties": {
+                    "inbox": { "type": "integer", "minimum": 0 },
+                    "claimed": { "type": "integer", "minimum": 0 },
+                    "work": { "type": "integer", "minimum": 0 },
+                    "pr": { "type": "integer", "minimum": 0 },
+                    "done": { "type": "integer", "minimum": 0 },
+                    "blocked": { "type": "integer", "minimum": 0 }
+                  },
+                  "additionalProperties": false
+                },
+                "tasks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["task_id", "state", "path"],
+                    "properties": {
+                      "task_id": { "type": "string", "minLength": 1 },
+                      "state": { "type": "string", "enum": ["inbox", "claimed", "work", "pr", "done", "blocked"] },
+                      "path": { "type": "string", "minLength": 1 },
+                      "updated_at": { "type": "string", "format": "date-time" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "claim-lock output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "claim-lock" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["result", "lock_path"],
+              "properties": {
+                "result": { "type": "string", "enum": ["CLAIMED", "LOCK_CONFLICT", "NOT_FOUND", "DENIED"] },
+                "lock_path": { "type": "string" },
+                "conflict_owner_hint": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "intake-validate output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "intake-validate" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["is_valid", "checks"],
+              "properties": {
+                "is_valid": { "type": "boolean" },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["check_id", "status"],
+                    "properties": {
+                      "check_id": { "type": "string", "minLength": 1 },
+                      "status": { "type": "string", "enum": ["PASS", "FAIL", "SKIP"] },
+                      "note": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "blocked_reason_codes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "patch-draft-request output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "patch-draft-request" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["request_id", "draft_patch_path", "rationale_path", "producer"],
+              "properties": {
+                "request_id": { "type": "string", "minLength": 1 },
+                "producer": { "type": "string", "enum": ["OPENCLAW", "HUMAN"] },
+                "draft_patch_path": { "type": "string", "minLength": 1 },
+                "rationale_path": { "type": "string", "minLength": 1 },
+                "notes": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "diff-risk-scan output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "diff-risk-scan" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["risk_level", "diff_stats", "policy_flags"],
+              "properties": {
+                "risk_level": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+                "diff_stats": {
+                  "type": "object",
+                  "required": ["files_changed", "insertions", "deletions"],
+                  "properties": {
+                    "files_changed": { "type": "integer", "minimum": 0 },
+                    "insertions": { "type": "integer", "minimum": 0 },
+                    "deletions": { "type": "integer", "minimum": 0 }
+                  },
+                  "additionalProperties": false
+                },
+                "policy_flags": {
+                  "type": "object",
+                  "required": ["delete_detected", "lockfile_touched", "protected_zone_touched", "allowlist_violation", "external_io_attempt"],
+                  "properties": {
+                    "delete_detected": { "type": "boolean" },
+                    "lockfile_touched": { "type": "boolean" },
+                    "protected_zone_touched": { "type": "boolean" },
+                    "allowlist_violation": { "type": "boolean" },
+                    "external_io_attempt": { "type": "boolean" }
+                  },
+                  "additionalProperties": false
+                },
+                "reasons": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                "diff_summary_path": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "gate-runner output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "gate-runner" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["gates", "all_pass"],
+              "properties": {
+                "all_pass": { "type": "boolean" },
+                "gates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["gate_id", "status"],
+                    "properties": {
+                      "gate_id": { "type": "string", "pattern": "^G[0-9]+$" },
+                      "status": { "type": "string", "enum": ["PASS", "FAIL", "SKIP"] },
+                      "evidence_paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                      "note": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "decision-router output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "decision-router" },
+            "skill_version": { "const": "1.0.0" },
+            "decision": { "enum": ["AUTO_MERGE", "PR_ONLY", "ZERO_STOP"] },
+            "data": {
+              "type": "object",
+              "required": ["decision", "next"],
+              "properties": {
+                "decision": { "type": "string", "enum": ["AUTO_MERGE", "PR_ONLY", "ZERO_STOP"] },
+                "next": {
+                  "type": "object",
+                  "required": ["skill"],
+                  "properties": { "skill": { "type": "string", "minLength": 1 }, "note": { "type": "string" } },
+                  "additionalProperties": false
+                },
+                "reasoning": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "pr-merge-orchestrator output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "pr-merge-orchestrator" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["mode", "plan"],
+              "properties": {
+                "mode": { "type": "string", "enum": ["AUTO_MERGE", "PR_ONLY"] },
+                "plan": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                "pr_url": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "audit-append output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "audit-append" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["appended", "audit_path"],
+              "properties": {
+                "appended": { "type": "boolean" },
+                "audit_path": { "type": "string", "minLength": 1 },
+                "record_digest": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "incident-brief output",
+      "allOf": [
+        { "$ref": "./skill_io_envelope.schema.json" },
+        {
+          "properties": {
+            "skill": { "const": "incident-brief" },
+            "skill_version": { "const": "1.0.0" },
+            "data": {
+              "type": "object",
+              "required": ["incident_id", "severity", "headline", "actions", "recovery_refs"],
+              "properties": {
+                "incident_id": { "type": "string", "minLength": 1 },
+                "severity": { "type": "string", "enum": ["SEV1", "SEV2", "SEV3"] },
+                "headline": { "type": "string", "minLength": 1 },
+                "impact": { "type": "string" },
+                "actions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                "recovery_refs": { "type": "array", "items": { "type": "string", "pattern": "^R[0-9]+$" } },
+                "notify_template": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+
+load:
+  - path: README.md
+  - path: config/policy/CURSOR_RULES.md
+  - path: config/policy/APPROVAL_MATRIX.md
+  - path: config/uiux/SCREENS.md
+  - path: plan.md

@@ -1,0 +1,10 @@
+
+---
+description: "Append-only Audit Log"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+- 상태 전이/결정/게이트 결과는 append-only로 기록
+- 과거 로그 수정/삭제 금지
+- 스키마: config/policy/AUDIT_LOG_SCHEMA.md
