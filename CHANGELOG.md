@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- (다음 릴리즈에 반영할 변경 사항)
+### Fixed
+
+- `AuditLogger.append_event`를 파일 배타 락 임계구역으로 변경해 `verify_integrity -> prev_hash 계산 -> append`를 원자적으로 수행하고, 락 획득 후 최신 파일 재읽기로 stale read를 방지함.
+- 동일 audit 로그 파일에 대한 멀티스레드/멀티프로세스 동시 append 테스트를 추가하고, 완료 후 `verify_integrity()` 통과를 검증함.
 
 ---
 
