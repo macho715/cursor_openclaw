@@ -75,7 +75,16 @@ def cmd_decide(args: argparse.Namespace) -> int:
     qp = _qp()
     st, task_dir = qp.find_task(args.task)
     d = decide(args.task, audit=_audit(args.task, task_dir), qp=qp)
-    (task_dir / "artifacts" / "decision.json").write_text(json.dumps({"decision": d.decision, "reason": d.reason}, indent=2), encoding="utf-8")
+    _, task_dir = qp.find_task(args.task)
+    blocked_dir = qp.task_dir(QueueState.BLOCKED, args.task)
+    if blocked_dir.exists():
+        task_dir = blocked_dir
+    artifacts_dir = task_dir / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    (artifacts_dir / "decision.json").write_text(
+        json.dumps({"decision": d.decision, "reason": d.reason}, indent=2),
+        encoding="utf-8",
+    )
     return 0
 
 
