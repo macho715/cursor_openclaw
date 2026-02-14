@@ -21,9 +21,13 @@ def _qp() -> QueuePaths:
     return QueuePaths()
 
 
-def _audit(task_id: str, task_dir: Path) -> AuditLogger:
-    # audit log per task (append-only)
-    return AuditLogger(task_dir / "audit" / "audit.log.jsonl")
+def _audit_path(task_id: str, qp: QueuePaths) -> Path:
+    # audit log per task (append-only, fixed location to survive task moves)
+    return qp.root / "audit" / f"{task_id}.jsonl"
+
+
+def _audit(task_id: str, qp: QueuePaths) -> AuditLogger:
+    return AuditLogger(_audit_path(task_id, qp))
 
 
 def ensure_task_exists(task_id: str, initial: QueueState = QueueState.INBOX) -> Path:
@@ -37,17 +41,17 @@ def ensure_task_exists(task_id: str, initial: QueueState = QueueState.INBOX) -> 
 
 def cmd_dry_run(args: argparse.Namespace) -> int:
     qp = _qp()
-    st, task_dir = qp.find_task(args.task)
+    _, task_dir = qp.find_task(args.task)
     (task_dir / "artifacts").mkdir(parents=True, exist_ok=True)
     payload = {"task_id": args.task, "dry_run": True, "note": "snapshot-only"}
     (task_dir / "artifacts" / "dry_run.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "DRY_RUN"})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "DRY_RUN"})
     return 0
 
 
 def cmd_diff(args: argparse.Namespace) -> int:
     qp = _qp()
-    st, task_dir = qp.find_task(args.task)
+    _, task_dir = qp.find_task(args.task)
     # require dry-run first
     dry = task_dir / "artifacts" / "dry_run.json"
     if not dry.exists():
@@ -55,33 +59,27 @@ def cmd_diff(args: argparse.Namespace) -> int:
     # Stage4: only diff packaging (no apply)
     patch = "diff --git a/README.md b/README.md\n# (placeholder) no real apply in Stage4\n"
     (task_dir / "artifacts" / "diff.patch").write_text(patch, encoding="utf-8")
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "DIFF"})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "DIFF"})
     return 0
 
 
 def cmd_gate(args: argparse.Namespace) -> int:
     qp = _qp()
     results = run_gate_pipeline(args.task, qp=qp)
-    st, task_dir = qp.find_task(args.task)
+    _, task_dir = qp.find_task(args.task)
     (task_dir / "artifacts" / "gate.json").write_text(
         json.dumps([{"gate_id": r.gate_id, "passed": r.passed, "reason": r.reason} for r in results], indent=2),
         encoding="utf-8",
     )
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "GATE"})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "GATE"})
     return 0
 
 
 def cmd_decide(args: argparse.Namespace) -> int:
     qp = _qp()
-    st, task_dir = qp.find_task(args.task)
-    d = decide(args.task, audit=_audit(args.task, task_dir), qp=qp)
+    d = decide(args.task, qp=qp)
     _, task_dir = qp.find_task(args.task)
-    blocked_dir = qp.task_dir(QueueState.BLOCKED, args.task)
-    if blocked_dir.exists():
-        task_dir = blocked_dir
-    artifacts_dir = task_dir / "artifacts"
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
-    (artifacts_dir / "decision.json").write_text(
+    (task_dir / "artifacts" / "decision.json").write_text(
         json.dumps({"decision": d.decision, "reason": d.reason}, indent=2),
         encoding="utf-8",
     )
@@ -94,7 +92,7 @@ def cmd_apply(args: argparse.Namespace) -> int:
     Only package an APPLY_REQUEST bundle that Cursor(Control-Plane) can approve/run.
     """
     qp = _qp()
-    st, task_dir = qp.find_task(args.task)
+    _, task_dir = qp.find_task(args.task)
 
     # enforce: dry-run -> diff -> gate -> decision must exist
     artifacts = task_dir / "artifacts"
@@ -109,14 +107,13 @@ def cmd_apply(args: argparse.Namespace) -> int:
         "artifacts": required,
     }
     (artifacts / "apply_request.json").write_text(json.dumps(bundle, indent=2), encoding="utf-8")
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "APPLY_REQUEST_PACKAGED"})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "APPLY_REQUEST_PACKAGED"})
     return 0
 
 
 def cmd_block(args: argparse.Namespace) -> int:
     qp = _qp()
-    st, task_dir = qp.find_task(args.task)
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "BLOCK", "reason": args.reason})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "BLOCK", "reason": args.reason})
     # move to blocked if allowed
     try:
         move_task(args.task, QueueState.BLOCKED, qp=qp)
@@ -128,16 +125,14 @@ def cmd_block(args: argparse.Namespace) -> int:
 def cmd_claim(args: argparse.Namespace) -> int:
     qp = _qp()
     move_task(args.task, QueueState.CLAIMED, qp=qp)
-    st, task_dir = qp.find_task(args.task)
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "CLAIM"})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "CLAIM"})
     return 0
 
 
 def cmd_work(args: argparse.Namespace) -> int:
     qp = _qp()
     move_task(args.task, QueueState.WORK, qp=qp)
-    st, task_dir = qp.find_task(args.task)
-    _audit(args.task, task_dir).append_event({"task_id": args.task, "event": "WORK"})
+    _audit(args.task, qp).append_event({"task_id": args.task, "event": "WORK"})
     return 0
 
 
