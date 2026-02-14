@@ -97,6 +97,19 @@ Prepare → Pilot → Build → Operate → Scale. KPI·기간은 [AGENTS.md](AG
 
 ---
 
+
+## CLI 실행
+
+`tools/cli.py`는 import 시 `sys.path`를 변경하지 않습니다. CLI는 패키지 실행으로 사용하세요.
+
+```bash
+python -m tools.cli --help
+```
+
+직접 스크립트 실행(`python tools/cli.py ...`)도 동작하지만, 기본 권장 경로는 `python -m tools.cli`입니다.
+
+---
+
 ## 빠른 시작(권장: DRY_RUN)
 
 ```bash

@@ -5,8 +5,8 @@ import json
 import sys
 from pathlib import Path
 
-# Ensure project root is on path when run as script
-if __name__ == "__main__" or "pytest" not in sys.modules:
+# Ensure project root is on path only when run as a direct script
+if __name__ == "__main__":
     _root = Path(__file__).resolve().parent.parent
     if str(_root) not in sys.path:
         sys.path.insert(0, str(_root))
