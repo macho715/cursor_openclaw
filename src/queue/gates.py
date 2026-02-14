@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from .state_machine import QueuePaths, QueueState, has_stop, move_task
+from .audit_logger import AuditLogger
+from .state_machine import QueuePaths, QueueState, TransitionError, has_stop, move_task
 
 
 class GateError(RuntimeError):
@@ -22,7 +23,9 @@ def task_artifacts_dir(task_dir: Path) -> Path:
     return task_dir / "artifacts"
 
 
-def require_task_in_state(task_id: str, state: QueueState, qp: QueuePaths | None = None) -> Path:
+def require_task_in_state(
+    task_id: str, state: QueueState, qp: QueuePaths | None = None
+) -> Path:
     qp = qp or QueuePaths()
     st, p = qp.find_task(task_id)
     if st != state:
@@ -30,14 +33,26 @@ def require_task_in_state(task_id: str, state: QueueState, qp: QueuePaths | None
     return p
 
 
-def require_no_stop(task_dir: Path, task_id: str, qp: QueuePaths | None = None) -> None:
+def require_no_stop(
+    task_dir: Path,
+    task_id: str,
+    qp: QueuePaths | None = None,
+    audit: AuditLogger | None = None,
+) -> None:
     if has_stop(task_dir):
         qp = qp or QueuePaths()
         # best effort: move to blocked if allowed from current state
         try:
             move_task(task_id, QueueState.BLOCKED, qp=qp)
-        except Exception:
-            pass
+        except TransitionError as e:
+            if audit:
+                audit.append_event(
+                    {
+                        "task_id": task_id,
+                        "event": "STOP_BLOCK_MOVE_SKIPPED",
+                        "reason": str(e),
+                    }
+                )
         raise GateError("STOP_DETECTED")
 
 
@@ -55,7 +70,11 @@ def require_diff(task_dir: Path) -> Path:
     return p
 
 
-def run_gate_pipeline(task_id: str, qp: QueuePaths | None = None) -> List[GateResult]:
+def run_gate_pipeline(
+    task_id: str,
+    qp: QueuePaths | None = None,
+    audit: AuditLogger | None = None,
+) -> List[GateResult]:
     qp = qp or QueuePaths()
     qp.ensure_dirs()
     # allow gating only from work or pr (strict)
@@ -63,7 +82,7 @@ def run_gate_pipeline(task_id: str, qp: QueuePaths | None = None) -> List[GateRe
     if st not in (QueueState.WORK, QueueState.PR):
         raise GateError(f"GATE_NOT_ALLOWED_FROM_STATE: {st.value}")
 
-    require_no_stop(task_dir, task_id, qp=qp)
+    require_no_stop(task_dir, task_id, qp=qp, audit=audit)
     require_dry_run(task_dir)
     require_diff(task_dir)
 

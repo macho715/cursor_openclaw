@@ -14,7 +14,7 @@ if __name__ == "__main__":
 from src.queue.audit_logger import AuditLogger
 from src.queue.decision import decide
 from src.queue.gates import run_gate_pipeline
-from src.queue.state_machine import QueuePaths, QueueState, move_task
+from src.queue.state_machine import QueuePaths, QueueState, TransitionError, move_task
 
 
 def _qp() -> QueuePaths:
@@ -57,7 +57,9 @@ def cmd_diff(args: argparse.Namespace) -> int:
     if not dry.exists():
         raise SystemExit("DRY_RUN_REQUIRED")
     # Stage4: only diff packaging (no apply)
-    patch = "diff --git a/README.md b/README.md\n# (placeholder) no real apply in Stage4\n"
+    patch = (
+        "diff --git a/README.md b/README.md\n# (placeholder) no real apply in Stage4\n"
+    )
     (task_dir / "artifacts" / "diff.patch").write_text(patch, encoding="utf-8")
     _audit(args.task, qp).append_event({"task_id": args.task, "event": "DIFF"})
     return 0
@@ -65,10 +67,16 @@ def cmd_diff(args: argparse.Namespace) -> int:
 
 def cmd_gate(args: argparse.Namespace) -> int:
     qp = _qp()
-    results = run_gate_pipeline(args.task, qp=qp)
     _, task_dir = qp.find_task(args.task)
+    results = run_gate_pipeline(args.task, qp=qp, audit=_audit(args.task, qp))
     (task_dir / "artifacts" / "gate.json").write_text(
-        json.dumps([{"gate_id": r.gate_id, "passed": r.passed, "reason": r.reason} for r in results], indent=2),
+        json.dumps(
+            [
+                {"gate_id": r.gate_id, "passed": r.passed, "reason": r.reason}
+                for r in results
+            ],
+            indent=2,
+        ),
         encoding="utf-8",
     )
     _audit(args.task, qp).append_event({"task_id": args.task, "event": "GATE"})
@@ -114,11 +122,18 @@ def cmd_apply(args: argparse.Namespace) -> int:
 def cmd_block(args: argparse.Namespace) -> int:
     qp = _qp()
     _audit(args.task, qp).append_event({"task_id": args.task, "event": "BLOCK", "reason": args.reason})
+    audit = _audit(args.task, qp)
     # move to blocked if allowed
     try:
         move_task(args.task, QueueState.BLOCKED, qp=qp)
-    except Exception:
-        pass
+    except TransitionError as e:
+        audit.append_event(
+            {
+                "task_id": args.task,
+                "event": "BLOCK_MOVE_SKIPPED",
+                "reason": str(e),
+            }
+        )
     return 0
 
 
