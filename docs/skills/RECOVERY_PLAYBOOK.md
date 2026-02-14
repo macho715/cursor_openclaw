@@ -1,7 +1,7 @@
 # RECOVERY_PLAYBOOK — R1~R8 Skill-level Mapping (Reference-only)
 
 ## 원칙
-- R1~R8 "정의/절차"는 Stage 5 SSOT(AGENTS.md)에 있음.
+- R1~R8 "정의/절차"는 Stage 5 SSOT(`../../AGENTS.md`)에 있음.
 - 본 문서는 "어떤 상황에서 어떤 R#을 호출(참조)하는지"만 매핑한다.
 - (가정) 아래 매핑은 보수적 추천안이며, SSOT와 다르면 SSOT가 우선.
 
