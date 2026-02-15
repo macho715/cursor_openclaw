@@ -1,3 +1,26 @@
+<#
+.SYNOPSIS
+Mode B one-cycle automation for task+patch gating and optional apply/commit/push.
+
+.DESCRIPTION
+This script enforces Mode B guardrails:
+- local git status as SSOT
+- git apply --check before apply
+- allowlist/secret/test checks via scripts/gate_local.py
+
+Typical interactive flow is two-phase:
+1) Launch Claude and generate outputs.
+2) Re-run with saved task/patch for gate and optional apply.
+
+.EXAMPLE
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -LaunchClaude -AutoStash
+
+.EXAMPLE
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -TaskJson .\tasks\T20260215-001.json -Patch .\patches\T20260215-001.patch
+
+.EXAMPLE
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -TaskJson .\tasks\T20260215-001.json -Patch .\patches\T20260215-001.patch -Apply -Commit -Push -CommitMessage "README: add (PROPOSED)"
+#>
 param(
     [string]$TaskJson = "",
     [string]$Patch = "",

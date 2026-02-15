@@ -113,6 +113,12 @@ git push
 `scripts/mode_b_cycle.ps1`로 Gate/Apply/Commit/Push를 일괄 처리할 수 있다.
 
 ```powershell
+# 완전 인터랙티브 1단계: Claude 실행 + 프롬프트 자동 표시/클립보드 복사
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -LaunchClaude -AutoStash
+
+# Claude 출력에서 task/patch를 저장한 뒤, 2단계: Gate만 실행
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -TaskJson .\tasks\TYYYYMMDD-001.json -Patch .\patches\TYYYYMMDD-001.patch
+
 # Gate까지만
 powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -TaskJson .\tasks\TYYYYMMDD-001.json -Patch .\patches\TYYYYMMDD-001.patch
 
