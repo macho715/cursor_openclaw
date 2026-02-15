@@ -108,6 +108,18 @@ git commit -am "README: add (PROPOSED)"
 git push
 ```
 
+### 자동화 스크립트(권장)
+
+`scripts/mode_b_cycle.ps1`로 Gate/Apply/Commit/Push를 일괄 처리할 수 있다.
+
+```powershell
+# Gate까지만
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -TaskJson .\tasks\TYYYYMMDD-001.json -Patch .\patches\TYYYYMMDD-001.patch
+
+# 적용 + 커밋 + 푸시
+powershell -ExecutionPolicy Bypass -File .\scripts\mode_b_cycle.ps1 -TaskJson .\tasks\TYYYYMMDD-001.json -Patch .\patches\TYYYYMMDD-001.patch -Apply -Commit -Push -CommitMessage "README: add (PROPOSED)"
+```
+
 ---
 
 ## 4. Touch 허용 파일 목록(최소권한)
