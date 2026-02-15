@@ -20,6 +20,7 @@
 ### 스택 운영자
 
 - [stack/RUNBOOK.md](../stack/RUNBOOK.md) - Phase별 실행, 롤백, 진단
+- [docs/STACK_USAGE.md](STACK_USAGE.md) - 스택 사용법 (접속 URL, 명령, openclaw-stub vs Gateway)
 - [stack/NEXT_STEPS.md](../stack/NEXT_STEPS.md) - 기동 후 작업
 - [docs/STACK_SESSION_REPORT.md](STACK_SESSION_REPORT.md) - 작업 이력·트러블슈팅
 - [config/VRAM_계산_요약.md](../config/VRAM_계산_요약.md) - VRAM 권장값
@@ -50,6 +51,7 @@
 | [docs/ARCHITECTURE.md](ARCHITECTURE.md) | 시스템 아키텍처 |
 | [docs/ROADMAP.md](ROADMAP.md) | 로드맵 |
 | [docs/STACK_SESSION_REPORT.md](STACK_SESSION_REPORT.md) | 스택 작업 이력·앞으로 할 일 |
+| [docs/STACK_USAGE.md](STACK_USAGE.md) | 스택 사용법 (접속, 명령, openclaw-stub vs Gateway) |
 | [docs/OPENCLAW_OLLAMA_WINDOWS_SUMMARY.md](OPENCLAW_OLLAMA_WINDOWS_SUMMARY.md) | OpenClaw+Ollama Windows 설치 요약 |
 | [docs/OLLAMA_OPENCLAW_USAGE.md](OLLAMA_OPENCLAW_USAGE.md) | Ollama/OpenClaw 사용법 |
 | [stack/RUNBOOK.md](../stack/RUNBOOK.md) | 스택 Phase 1~3, 롤백, 진단 |
