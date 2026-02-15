@@ -175,10 +175,80 @@ def parse_touched_files_from_patch(patch_text: str) -> List[str]:
 
 
 def extract_diff_only(text: str) -> Optional[str]:
+    # Prefer explicit patch block when model follows wrapper convention.
+    begin = text.find("---BEGIN_PATCH---")
+    end = text.find("---END_PATCH---")
+    if begin >= 0 and end > begin:
+        block = text[begin + len("---BEGIN_PATCH---"):end].strip()
+        if "diff --git " in block:
+            idx = block.find("diff --git ")
+            return block[idx:].strip()
+
+    # Fallback: extract from first diff header in whole output.
     idx = text.find("diff --git ")
     if idx < 0:
         return None
-    return text[idx:].strip()
+    tail = text[idx:]
+    # Drop common trailing sentinel text if present.
+    sentinel = "\nGIT_STATUS_DELTA_EXPECTED=0"
+    sidx = tail.find(sentinel)
+    if sidx >= 0:
+        tail = tail[:sidx]
+    return tail.strip()
+
+
+def unified_diff_hunks_valid(patch_text: str) -> Tuple[bool, str]:
+    """
+    Lightweight structural validation to reject clearly malformed hunks
+    before git apply --check.
+    """
+    lines = patch_text.splitlines()
+    i = 0
+    saw_hunk = False
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("@@ "):
+            saw_hunk = True
+            # @@ -a,b +c,d @@
+            try:
+                header = line.split("@@")[1].strip()
+                old_part, new_part = header.split(" ")
+                old_counts = old_part.lstrip("-").split(",")
+                new_counts = new_part.lstrip("+").split(",")
+                old_need = int(old_counts[1]) if len(old_counts) == 2 else 1
+                new_need = int(new_counts[1]) if len(new_counts) == 2 else 1
+            except Exception:
+                return False, "MALFORMED_HUNK_HEADER"
+
+            old_seen = 0
+            new_seen = 0
+            i += 1
+            while i < len(lines):
+                row = lines[i]
+                if row.startswith("@@ ") or row.startswith("diff --git "):
+                    break
+                if row.startswith("\\ No newline at end of file"):
+                    i += 1
+                    continue
+                if row.startswith(" "):
+                    old_seen += 1
+                    new_seen += 1
+                elif row.startswith("-"):
+                    old_seen += 1
+                elif row.startswith("+"):
+                    new_seen += 1
+                else:
+                    return False, "MALFORMED_HUNK_BODY"
+                i += 1
+
+            if old_seen != old_need or new_seen != new_need:
+                return False, f"HUNK_COUNT_MISMATCH: old={old_seen}/{old_need} new={new_seen}/{new_need}"
+            continue
+        i += 1
+
+    if not saw_hunk:
+        return False, "NO_HUNK_HEADER"
+    return True, "OK"
 
 
 def run_cmd(cmd: List[str], cwd: Path, timeout: int = 300) -> Tuple[int, str]:
@@ -269,8 +339,19 @@ def build_task_json(task_id: str, chat_id: int, work_text: str, cfg: Cfg) -> Dic
     }
 
 
-def run_claude_code_patch(work_text: str, cfg: Cfg, timeout_sec: int = 900) -> Tuple[bool, str, str]:
+def run_claude_code_patch(
+    work_text: str,
+    cfg: Cfg,
+    timeout_sec: int = 900,
+    retry_hint: str = "",
+) -> Tuple[bool, str, str]:
     prompt = "\n".join(cfg.prompt_template).format(WORK_TEXT=work_text)
+    if retry_hint:
+        prompt += (
+            "\nPrevious output was invalid. Regenerate from scratch."
+            "\nReturn ONLY one valid git-applyable unified diff."
+            f"\nFailure reason: {retry_hint}"
+        )
     cmd = cfg.ollama_launch_cmd + ["--model", cfg.model_primary, "--", "-p", prompt]
     env = os.environ.copy()
     env["ANTHROPIC_BASE_URL"] = cfg.anthropic_base_url
@@ -307,6 +388,10 @@ def validate_patch_text(patch_text: str, cfg: Cfg) -> Tuple[bool, str, List[str]
     touched = parse_touched_files_from_patch(patch_text)
     if not touched:
         return False, "NO_TOUCHED_FILES", []
+
+    ok_hunks, hunk_reason = unified_diff_hunks_valid(patch_text)
+    if not ok_hunks:
+        return False, hunk_reason, touched
 
     for f in touched:
         if glob_match(f, cfg.denylist):
@@ -600,35 +685,54 @@ def main() -> int:
             task_path = cfg.q_inbox / f"{task_id}__work.json"
             task_path.write_text(json.dumps(task_json, ensure_ascii=False, indent=2), encoding="utf-8")
 
-            ok, diff_or_raw, code = run_claude_code_patch(work_text, cfg)
-            if not ok:
-                send_tg(cfg.tg_token, chat_id, cfg.tmpl_fail_patch_invalid.format(task_id=task_id, reason=code)[: cfg.reply_max_chars])
+            final_patch_text = None
+            final_touched: List[str] = []
+            fail_reason = ""
+            for attempt in range(2):
+                hint = fail_reason if attempt > 0 else ""
+                ok, diff_or_raw, code = run_claude_code_patch(work_text, cfg, retry_hint=hint)
+                if not ok:
+                    fail_reason = code
+                    continue
+
+                patch_text = diff_or_raw
+                valid, reason, touched = validate_patch_text(patch_text, cfg)
+                if not valid:
+                    fail_reason = reason
+                    continue
+
+                patch_path = cfg.patch_dir / f"{task_id}.patch"
+                patch_path.write_text(patch_text, encoding="utf-8")
+
+                if cfg.require_git_apply_check:
+                    ok_check, out_check = git_apply_check(cfg.repo_root, patch_path)
+                    if not ok_check:
+                        fail_reason = ("GIT_APPLY_CHECK_FAIL: " + out_check[:1200]) if out_check else "GIT_APPLY_CHECK_FAIL"
+                        continue
+
+                final_patch_text = patch_text
+                final_touched = touched
+                break
+
+            if final_patch_text is None:
+                send_tg(
+                    cfg.tg_token,
+                    chat_id,
+                    cfg.tmpl_fail_patch_invalid.format(task_id=task_id, reason=fail_reason or "PATCH_INVALID")[: cfg.reply_max_chars],
+                )
                 write_audit_line(
                     cfg.q_audit / "events.ndjson",
-                    {"ts": _utc_iso(), "actor": "orchestrator", "action": "CLAUDE_NO_DIFF", "task_id": task_id, "reason": code, "raw_hash": sha256_text(diff_or_raw) if diff_or_raw else None},
+                    {
+                        "ts": _utc_iso(),
+                        "actor": "orchestrator",
+                        "action": "PATCH_INVALID",
+                        "task_id": task_id,
+                        "reason": fail_reason or "PATCH_INVALID",
+                        "attempts": 2,
+                    },
                 )
                 last_reply_at = time.time()
                 continue
-
-            patch_text = diff_or_raw
-            valid, reason, touched = validate_patch_text(patch_text, cfg)
-            if not valid:
-                send_tg(cfg.tg_token, chat_id, cfg.tmpl_fail_patch_invalid.format(task_id=task_id, reason=reason)[: cfg.reply_max_chars])
-                write_audit_line(cfg.q_audit / "events.ndjson", {"ts": _utc_iso(), "actor": "orchestrator", "action": "PATCH_INVALID", "task_id": task_id, "reason": reason, "touched": touched})
-                last_reply_at = time.time()
-                continue
-
-            patch_path = cfg.patch_dir / f"{task_id}.patch"
-            patch_path.write_text(patch_text, encoding="utf-8")
-
-            if cfg.require_git_apply_check:
-                ok_check, out_check = git_apply_check(cfg.repo_root, patch_path)
-                if not ok_check:
-                    reason2 = ("GIT_APPLY_CHECK_FAIL: " + out_check[:1200]) if out_check else "GIT_APPLY_CHECK_FAIL"
-                    send_tg(cfg.tg_token, chat_id, cfg.tmpl_fail_patch_invalid.format(task_id=task_id, reason=reason2)[: cfg.reply_max_chars])
-                    write_audit_line(cfg.q_audit / "events.ndjson", {"ts": _utc_iso(), "actor": "orchestrator", "action": "GATE_APPLY_CHECK_FAIL", "task_id": task_id, "detail": out_check[:3000]})
-                    last_reply_at = time.time()
-                    continue
 
             report = {
                 "task_id": task_id,
@@ -638,14 +742,14 @@ def main() -> int:
                 "goal": work_text,
                 "engine": "claude_code",
                 "patch_path": str(patch_path),
-                "touched": touched,
+                "touched": final_touched,
                 "gates": {"porcelain2_clean": True, "git_apply_check": True},
-                "hashes": {"patch_sha256": sha256_text(patch_text)},
+                "hashes": {"patch_sha256": sha256_text(final_patch_text)},
             }
             report_path = cfg.reports_dir / f"{task_id}.report.json"
             report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
-            write_audit_line(cfg.q_audit / "events.ndjson", {"ts": _utc_iso(), "actor": "orchestrator", "action": "PATCH_PROPOSED", "task_id": task_id, "patch_sha256": report["hashes"]["patch_sha256"], "touched": touched})
+            write_audit_line(cfg.q_audit / "events.ndjson", {"ts": _utc_iso(), "actor": "orchestrator", "action": "PATCH_PROPOSED", "task_id": task_id, "patch_sha256": report["hashes"]["patch_sha256"], "touched": final_touched})
 
             # remember last task
             last_task_by_chat[str(chat_id)] = task_id
