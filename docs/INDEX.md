@@ -52,6 +52,8 @@
 | [docs/ROADMAP.md](ROADMAP.md) | 로드맵 |
 | [docs/STACK_SESSION_REPORT.md](STACK_SESSION_REPORT.md) | 스택 작업 이력·앞으로 할 일 |
 | [docs/MODE_B_OPERATION_RUNBOOK.md](MODE_B_OPERATION_RUNBOOK.md) | Mode B(Claude=티켓+diff) 운영·Gate·allowlist |
+| [docs/MODE_B_TELEGRAM_AUTOMATION.md](MODE_B_TELEGRAM_AUTOMATION.md) | Telegram 2단 승인 자동화 Full Pack |
+| [docs/WORKLOG_2026-02-16.md](WORKLOG_2026-02-16.md) | 2026-02-16 작업 로그 (Orchestrator, /approve) |
 | [docs/STACK_USAGE.md](STACK_USAGE.md) | 스택 사용법 (접속, 명령, openclaw-stub vs Gateway) |
 | [docs/OPENCLAW_OLLAMA_WINDOWS_SUMMARY.md](OPENCLAW_OLLAMA_WINDOWS_SUMMARY.md) | OpenClaw+Ollama Windows 설치 요약 |
 | [docs/OLLAMA_OPENCLAW_USAGE.md](OLLAMA_OPENCLAW_USAGE.md) | Ollama/OpenClaw 사용법 |

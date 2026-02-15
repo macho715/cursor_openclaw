@@ -84,6 +84,26 @@
 | ollama unhealthy → openclaw 기동 실패 | healthcheck의 wget 미지원 | `ollama list` 기반으로 변경 |
 | openclaw-stub vs 호스트 OpenClaw | 모델 설정 경로 상이 | 스택: `OLLAMA_MODEL`(docker-compose). 호스트: `openclaw.json` |
 
+### 1.9 patch3 스캐폴딩 (2026-02-15)
+
+- init_queue.sh, 워커 산출(patch, report), Gate PASS, `.autodev_queue/` 적용 완료.
+- [WORKLOG_2026-02-15.md](WORKLOG_2026-02-15.md)
+
+### 1.10 Telegram 스모크 테스트 (2026-02-15)
+
+- getMe/sendMessage ok, macho1901bot, chat_id 470962761.
+
+### 1.11 Telegram Mode B 운영 전환 (2026-02-16)
+
+| 항목 | 내용 |
+|------|------|
+| Orchestrator | `tg_orchestrator.py` — /work, /status, /approve, /reject |
+| 2단 승인 | `approved/` 플래그 + `cursor_apply_approved.ps1` |
+| 트러블슈팅 | HTTP 409 중복 poller, repo_clean .gitignore |
+
+- [MODE_B_TELEGRAM_AUTOMATION.md](MODE_B_TELEGRAM_AUTOMATION.md), [WORKLOG_2026-02-16.md](WORKLOG_2026-02-16.md)
+- 커밋: 3f8f910
+
 ---
 
 ## 2. 현재 스택 상태
