@@ -41,6 +41,7 @@
 | `MANIFEST.json` | 프로젝트명, stage_current/stage_next, baton_file |
 | `BATON_CURRENT.md` | 현재 Stage 요약(예: Stage 3 → 4) |
 | `docs/CLAUDE_CODE_OLLAMA_WINDOWS_RUNBOOK.md` | Windows 기준 Claude Code + Ollama 설치/연동/운영 런북 |
+| `docs/MODE_B_OPERATION_RUNBOOK.md` | Mode B(Claude=티켓+diff) 운영·Gate·allowlist |
 | `docs/WORKLOG_2026-02-15.md` | 이번 세션 작업 이력/검증 결과 |
 | `docs/NEXT_PLAN.md` | 다음 단계 실행 계획 |
 | `README_AUTODEV.md` | Queue 기반 운영 절차(Worker는 diff-only, Cursor만 apply/test/commit) |
