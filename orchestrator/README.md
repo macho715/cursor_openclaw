@@ -34,6 +34,22 @@ python main.py
 
 Enter `/work` text when prompted.
 
+One-shot mode:
+
+```powershell
+python main.py --work-text "README first line append (PROPOSED)"
+```
+
+Telegram polling mode (Updater):
+
+```powershell
+python main.py --polling
+```
+
+Telegram commands:
+- `/start`
+- `/work <instruction>`
+
 ## Notes
 
 - If token/chat_id placeholders remain, Telegram send is skipped.
