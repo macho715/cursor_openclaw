@@ -32,3 +32,8 @@ patches/
 orchestrator/patches/*.patch
 orchestrator/reports/*.json
 
+
+# Runtime artifacts
+.autodev_runtime/
+logs/
+
