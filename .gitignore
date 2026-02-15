@@ -27,3 +27,8 @@ Thumbs.db
 # Mode B artifacts
 patches/
 
+
+# Orchestrator artifacts
+orchestrator/patches/*.patch
+orchestrator/reports/*.json
+

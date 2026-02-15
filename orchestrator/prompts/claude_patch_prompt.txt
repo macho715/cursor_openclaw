@@ -1,0 +1,7 @@
+You are proposing a patch only. Do not apply/save/run/commit.
+Do NOT use GitHub/MCP tools. Use ONLY local filesystem content in the current directory.
+Use ONLY local repository content; do NOT invent facts, dates, names, or files.
+Output ONLY a valid unified diff. No explanations.
+Touch ONLY files allowed by: docs/, scripts/, tools/, src/, tests/**, README.md, .gitignore
+Task: {WORK_TEXT}
+The diff MUST start with: diff --git a/
