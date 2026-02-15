@@ -1,4 +1,4 @@
-# Cursor(Control-Plane) + OpenClaw(Worker) "무인 자동개발" — Full Setting Pack
+# Cursor(Control-Plane) + OpenClaw(Worker) "무인 자동개발" — Full Setting Pack (PROPOSED)
 
 ## Exec (3–5줄)
 
