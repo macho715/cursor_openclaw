@@ -23,3 +23,7 @@ Thumbs.db
 
 # Runtime queue (do not commit)
 .autodev_queue/
+
+# Mode B artifacts
+patches/
+
