@@ -12,6 +12,7 @@ if __name__ == "__main__":
         sys.path.insert(0, str(_root))
 
 from src.queue.audit_logger import AuditLogger
+from src.queue.audit_paths import audit_path
 from src.queue.decision import decide
 from src.queue.gates import run_gate_pipeline
 from src.queue.state_machine import QueuePaths, QueueState, TransitionError, move_task
@@ -22,8 +23,7 @@ def _qp() -> QueuePaths:
 
 
 def _audit_path(task_id: str, qp: QueuePaths) -> Path:
-    # audit log per task (append-only, fixed location to survive task moves)
-    return qp.root / "audit" / f"{task_id}.jsonl"
+    return audit_path(task_id, qp)
 
 
 def _audit(task_id: str, qp: QueuePaths) -> AuditLogger:

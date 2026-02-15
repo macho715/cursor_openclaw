@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from src.queue.audit_logger import AuditLogger
+from src.queue.audit_paths import audit_path
 from src.queue.decision import decide
 from src.queue.gates import GateError, require_no_stop
 from src.queue.state_machine import QueuePaths, QueueState, TransitionError
@@ -33,7 +34,7 @@ def test_require_no_stop_handles_transition_error_and_logs_audit(
     task_id = "T100"
     task_dir = _mk_task(qp, QueueState.WORK, task_id)
     (task_dir / "STOP").write_text("STOP\n", encoding="utf-8")
-    audit = AuditLogger(qp.root / "audit" / f"{task_id}.jsonl")
+    audit = AuditLogger(audit_path(task_id, qp))
 
     def _raise_transition(*args: Any, **kwargs: Any) -> None:
         raise TransitionError("INVALID_TRANSITION: work -> blocked")
@@ -79,9 +80,10 @@ def test_cmd_block_handles_transition_error_and_surfaces_unexpected(
     monkeypatch.setattr("tools.cli.move_task", _raise_transition)
     assert cmd_block(args) == 0
 
-    audit_path = qp.root / "audit" / f"{task_id}.jsonl"
+    audit_log_path = audit_path(task_id, qp)
     records = [
-        json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()
+        json.loads(line)
+        for line in audit_log_path.read_text(encoding="utf-8").splitlines()
     ]
     assert records[-1]["event"] == "BLOCK_MOVE_SKIPPED"
 
@@ -99,7 +101,7 @@ def test_decide_handles_transition_error_and_surfaces_unexpected(
     task_id = "T103"
     task_dir = _mk_task(qp, QueueState.WORK, task_id)
     (task_dir / "STOP").write_text("STOP\n", encoding="utf-8")
-    audit_path = qp.root / "audit" / f"{task_id}.jsonl"
+    audit_log_path = audit_path(task_id, qp)
 
     def _raise_transition(*args: Any, **kwargs: Any) -> None:
         raise TransitionError("INVALID_TRANSITION: work -> blocked")
@@ -109,7 +111,8 @@ def test_decide_handles_transition_error_and_surfaces_unexpected(
     assert decision.decision == "ZERO_STOP"
 
     records = [
-        json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()
+        json.loads(line)
+        for line in audit_log_path.read_text(encoding="utf-8").splitlines()
     ]
     assert records[-2]["event"] == "DECIDE_BLOCK_MOVE_SKIPPED"
     assert records[-1]["event"] == "DECIDE"

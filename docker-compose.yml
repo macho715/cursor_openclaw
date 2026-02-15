@@ -1,0 +1,47 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  openclaw-worker:
+    build:
+      context: ./openclaw_worker
+    container_name: openclaw-worker
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5-coder:7b}
+      - QUEUE_DIR=/queue
+      - REPO_DIR=/repo
+      - SSOT_DIR=/ssot
+      - POLL_SECONDS=2
+      - DRY_RUN=1
+      - MAX_FILE_BYTES=120000
+      - MAX_CONTEXT_FILES=8
+    volumes:
+      - ./.autodev_queue:/queue
+      - ./.autodev_ssot:/ssot:ro
+      - ./:/repo:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    profiles: ["worker"]
+
+volumes:
+  ollama: {}

@@ -76,3 +76,7 @@ def touch_stop_flag(task_dir: Path) -> None:
 
 def has_stop(task_dir: Path) -> bool:
     return (task_dir / "STOP").exists()
+
+
+def has_global_stop(qp: QueuePaths) -> bool:
+    return (qp.root / "STOP").exists()
