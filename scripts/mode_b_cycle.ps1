@@ -34,6 +34,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+[Console]::InputEncoding = [Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
 
 function Run-Step {
     param(
@@ -99,19 +101,25 @@ Run-Step -Message "Precheck: git worktree status" -Action {
 if ($LaunchClaude) {
     Run-Step -Message "Launch Claude on Ollama (interactive)" -Action {
         $prompt = @"
-이 리포에서 README.md 첫 줄 끝에 ` (PROPOSED)`만 추가해.
-반드시 README.md를 실제로 읽고, 존재하는 줄만 수정해(발명 금지).
-출력은 아래 2블록만, 다른 텍스트/설명/예시 금지.
+Read README.md from the current repository.
+Output ONLY the following two blocks and nothing else.
+Do not include any explanations or examples.
+
+Constraints:
+- Change EXACTLY ONE line in README.md.
+- Append ` (PROPOSED)` to the END of the FIRST line only.
+- The patch must be git-applyable unified diff.
+- The diff must start with: diff --git a/README.md b/README.md
 
 ---BEGIN_TASK_JSON---
 (task.json)
 ---END_TASK_JSON---
 
 ---BEGIN_PATCH---
-(git apply 가능한 unified diff, README.md 1줄만 변경)
+(git-applyable unified diff for README.md, one line changed total)
 ---END_PATCH---
 
-마지막 줄은 정확히 GIT_STATUS_DELTA_EXPECTED=0
+Final line must be exactly: GIT_STATUS_DELTA_EXPECTED=0
 "@
         Write-Host "Paste this prompt in Claude after launch:" -ForegroundColor Yellow
         Write-Host $prompt
