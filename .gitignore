@@ -37,3 +37,8 @@ orchestrator/reports/*.json
 .autodev_runtime/
 logs/
 
+
+# Local import artifacts
+AUTODEV_TELEGRAM_MODEB_FULLPACK_APPROVE/
+AUTODEV_TELEGRAM_MODEB_FULLPACK_APPROVE.zip
+
