@@ -15,10 +15,14 @@
 - `.env`와 문서에서 기본 모델값 단일화
 - `docker-compose.yml` 기본 모델도 동일 값으로 통일 여부 결정
 
-3. Gate 운영 규칙 고정
+3. Gate 운영 규칙 고정 (Mode B)
 - Gate FAIL 시 표준 처리:
   - `blocked` 이동
   - 실패 코드별 조치 템플릿 적용
+- SSOT는 로컬 git 출력으로 확정:
+  - `git apply --check` 통과 전 절대 미적용
+  - allowlist 위반 시 즉시 FAIL
+  - 설명/예시 혼합 출력은 즉시 폐기
 
 ### P1 (단기)
 1. Gate 자동 분류 확장
