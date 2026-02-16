@@ -47,9 +47,6 @@
 | `docs/STACK_SESSION_REPORT.md` | 스택(ollama/openclaw) 작업 이력 |
 | `stack/RUNBOOK.md` | 스택 Phase 1~3 실행·롤백·진단 |
 | `stack/NEXT_STEPS.md` | 스택 기동 후 작업(모델 pull, Grafana) |
-| `cursor_openclaw/` | Mode B 서브프로젝트 (Orchestrator, Telegram /work, 2단 승인) |
-| `cursor_openclaw/docs/MODE_B_TELEGRAM_AUTOMATION.md` | Telegram 2단 승인 자동화 Full Pack |
-| `cursor_openclaw/docs/WORKLOG_2026-02-16.md` | 2026-02-16 작업 로그 |
 
 ---
 
@@ -65,7 +62,7 @@
 
 ## 경로 정책(allowlist)
 
-- **허용**: `.cursor/`, `.github/`, `config/`, `docs/`, `orchestrator/`, `tools/`, `tests/`, `pyproject.toml`, `plan.md`, `CODEOWNERS`, `README.md`, `MANIFEST.json`, `BATON_CURRENT.md`
+- **허용**: `.cursor/`, `.github/`, `config/`, `tools/`, `tests/`, `pyproject.toml`, `plan.md`, `CODEOWNERS`, `README.md`, `MANIFEST.json`, `BATON_CURRENT.md`
 - UI/UX 문서의 `docs/policy/*`는 **`config/policy/*`** 로 통일.
 
 ---

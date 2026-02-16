@@ -65,6 +65,8 @@ Docker 실행 시 다운이 반복되면, 프로젝트 루트에서:
 | OOM / GPU 다운 | CTX 4096→3072, 더 작은 모델(qwen2.5:7b Q4) |
 | 설치 중 다운 | Phase 1만 실행, 나머지는 안정 후 추가 |
 | ingest 빌드 실패 | `stack/ingest/tg`, `stack/ingest/wa` 미존재. vram.md 기반 디렉터리 생성 필요 |
+| **patch3 ollama 컨테이너 충돌** | 기존 ollama가 이미 실행 중 | `docker compose --profile worker up -d --build --no-deps openclaw-worker`로 워커만 기동 |
+| **patch3 워커 404 (모델 없음)** | 기본 qwen2.5-coder:7b 미설치 | `.env`에 `OLLAMA_MODEL=kwangsuklee/SEOKDONG-llama3.1_korean_Q5_K_M:latest` 설정 후 워커 재기동 |
 
 ---
 
@@ -114,7 +116,18 @@ Phase 1~3 완료 후: 모델 pull, openclaw 검증, Grafana 설정. `run-next-st
 
 ---
 
-## 8. 참조
+## 8. patch3 autodev-queue (별도 스캐폴딩)
+
+patch3 기반 autodev-queue 스캐폴딩 사용 시:
+
+- **실행 순서**: init_queue.sh → docker compose up -d (또는 워커만 기동) → submit_task.sh
+- **ollama 충돌 시**: 기존 ollama 재사용, `docker compose --profile worker up -d --build --no-deps openclaw-worker`
+- **모델 404 시**: `.env`에 `OLLAMA_MODEL=kwangsuklee/SEOKDONG-llama3.1_korean_Q5_K_M:latest` 설정
+- 상세: [docs/STACK_SESSION_REPORT.md](../docs/STACK_SESSION_REPORT.md) §1.9
+
+---
+
+## 9. 참조
 
 - [README_RUN.md](README_RUN.md) - RUNBOOK 빠른 요약
 - [NEXT_STEPS.md](NEXT_STEPS.md) - 스택 기동 후 상세
@@ -123,4 +136,5 @@ Phase 1~3 완료 후: 모델 pull, openclaw 검증, Grafana 설정. `run-next-st
 - `run-phase2-logged.cmd` - Phase2 (openclaw) 로깅
 - `run-phase3-logged.cmd` - Phase3 (prometheus, grafana) 로깅
 - [config/VRAM_계산_요약.md](../config/VRAM_계산_요약.md) - VRAM 권장값
+- [docs/STACK_SESSION_REPORT.md](../docs/STACK_SESSION_REPORT.md) - patch3 실행·트러블슈팅
 - [run-ollama.ps1](../run-ollama.ps1) - 호스트 Ollama (섹션 2 대안)

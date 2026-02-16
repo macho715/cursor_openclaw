@@ -84,6 +84,58 @@
 | ollama unhealthy → openclaw 기동 실패 | healthcheck의 wget 미지원 | `ollama list` 기반으로 변경 |
 | openclaw-stub vs 호스트 OpenClaw | 모델 설정 경로 상이 | 스택: `OLLAMA_MODEL`(docker-compose). 호스트: `openclaw.json` |
 
+### 1.9 patch3 스캐폴딩 실행 (2026-02-15)
+
+patch3 기반 autodev-queue 스캐폴딩 적용 및 검증 완료.
+
+**실행 흐름**
+
+| 단계 | 명령/작업 | 결과 |
+|------|-----------|------|
+| 1 | 스캐폴딩 생성 | docker-compose.yml, .autodev_ssot/ 4종, scripts/, openclaw_worker/ |
+| 2 | init_queue.sh | 성공 |
+| 3 | docker compose up -d | ollama 컨테이너 이름 충돌로 1차 실패 |
+| 4 | 워커만 기동 | `docker compose --profile worker up -d --build --no-deps openclaw-worker` |
+| 5 | submit_task.sh (task_template.json) | 성공 |
+| 6 | 워커 산출물 | T20260215-0001.patch, T20260215-0001.report.json |
+| 7 | Gate | gate_local.sh T20260215-0001.patch → PASS |
+| 8 | 감사 로그 | events.ndjson에 TASK_CLAIMED, PATCH_PROPOSED 기록 |
+
+**트러블슈팅**
+
+| 증상 | 원인 | 대응 |
+|------|------|------|
+| ollama 컨테이너 이름 충돌 | 기존 healthy ollama 이미 실행 중 | 기존 ollama 재사용, 워커만 `--no-deps`로 기동 |
+| 워커 404 (모델 없음) | 기본 모델 qwen2.5-coder:7b 미설치 | `.env`에 `OLLAMA_MODEL=kwangsuklee/SEOKDONG-llama3.1_korean_Q5_K_M:latest` 설정 후 워커 재기동 |
+
+### 1.10 Telegram 스모크 테스트 (2026-02-15)
+
+openclaw.json Telegram 설정 검증 완료.
+
+| 항목 | 결과 |
+|------|------|
+| getMe | ok=true (토큰 유효) |
+| bot username | macho1901bot |
+| sendMessage | ok=true |
+| 대상 chat_id | 470962761 |
+| message_id | 157 |
+
+- **결과**: openclaw.json의 botToken/allowFrom 조합으로 실제 1회 수신 테스트 성공.
+
+### 1.11 Telegram Mode B 운영 전환 (2026-02-16)
+
+Telegram 기반 Mode B 운영 가동 + 2단 승인 흐름 구축.
+
+| 항목 | 내용 |
+|------|------|
+| **Orchestrator** | `tg_orchestrator.py` — `/work`, `/status`, `/stop`, `/resume`, `/approve`, `/reject` |
+| **2단 승인** | `.autodev_queue/approved/<task_id>.approved.json` 플래그 + `cursor_apply_approved.ps1` |
+| **입력 품질** | WORK_TEXT_TOO_SHORT, INTENT_MISSING, TARGET_MISSING 자동 거절 |
+| **트러블슈팅** | HTTP 409(중복 poller) → 단일 인스턴스만 유지, repo_clean → .gitignore 보강 |
+
+- **문서**: `docs/MODE_B_TELEGRAM_AUTOMATION.md`, `docs/WORKLOG_2026-02-16.md`
+- **커밋**: 3f8f910 (2단 승인 플로우)
+
 ---
 
 ## 2. 현재 스택 상태
