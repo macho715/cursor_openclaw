@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "autodev_audit_event",
+  "type": "object",
+  "required": [
+    "ts",
+    "level",
+    "actor",
+    "action",
+    "task_id",
+    "repo_ref",
+    "inputs_sha256",
+    "outputs_sha256",
+    "meta"
+  ],
+  "properties": {
+    "ts": { "type": "string", "description": "RFC3339 timestamp" },
+    "level": { "type": "string", "enum": ["INFO", "WARN", "ERROR"] },
+    "actor": { "type": "string", "enum": ["claude_code", "cursor", "openclaw", "system"] },
+    "action": {
+      "type": "string",
+      "enum": [
+        "TASK_SUBMITTED",
+        "TASK_CLAIMED",
+        "PATCH_PROPOSED",
+        "TASK_BLOCKED",
+        "STOP_DETECTED",
+        "ERROR"
+      ]
+    },
+    "task_id": { "type": "string" },
+    "repo_ref": { "type": "string", "description": "commit SHA or snapshot id" },
+    "inputs_sha256": { "type": "string" },
+    "outputs_sha256": { "type": "string" },
+    "meta": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": false
+}

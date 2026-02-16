@@ -1,0 +1,40 @@
+{
+  "task_id": "T{YYYYMMDD-HHMMSS}",
+  "source": "telegram",
+  "command": "/work",
+  "goal": "{WORK_TEXT_RAW}",
+  "constraints": {
+    "diff_only": true,
+    "no_apply_no_commit_no_push": true,
+    "no_remote_tools": true
+  },
+  "scope": {
+    "allowlist": [
+      "docs/**",
+      "scripts/**",
+      "tools/**",
+      "src/**",
+      "tests/**",
+      "README.md",
+      ".gitignore"
+    ],
+    "denylist": [
+      ".git/**",
+      ".openclaw/**",
+      ".autodev_ssot/**",
+      ".autodev_queue/**",
+      "**/*.pem",
+      "**/*.key",
+      "**/*.pfx",
+      "**/*.kdbx"
+    ]
+  },
+  "gates": {
+    "require_clean_porcelain2": true,
+    "require_git_apply_check": true
+  },
+  "meta": {
+    "requested_by_chat_id": "{CHAT_ID}",
+    "requested_at": "{UTC_ISO}"
+  }
+}

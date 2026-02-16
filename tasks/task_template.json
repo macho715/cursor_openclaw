@@ -1,0 +1,22 @@
+{
+  "task_id": "T20260215-0001",
+  "title": "예시: README 문구 개선(안전한 변경)",
+  "goal": "README_AUTODEV.md의 '빠른 시작' 섹션을 더 명확하게 수정한다.",
+  "scope": {
+    "target_files": ["README_AUTODEV.md"],
+    "allow_patch_on_files": ["README_AUTODEV.md"],
+    "deny_paths_glob": [".git/**", ".autodev_queue/**", ".autodev_ssot/**"]
+  },
+  "requirements": {
+    "output_format": "unified_diff",
+    "must_not": ["secrets", "tokens", "keys"],
+    "tests": []
+  },
+  "context": {
+    "notes": "문서만 변경. 기능 변경 금지."
+  },
+  "meta": {
+    "created_by": "claude_code",
+    "created_at": "2026-02-15T00:00:00Z"
+  }
+}

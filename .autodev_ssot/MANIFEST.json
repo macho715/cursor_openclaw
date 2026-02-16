@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "project_name": "autodev-queue-controlplane",
+  "stage_current": "PILOT",
+  "stage_next": "BUILD",
+  "paths": {
+    "queue_dir": ".autodev_queue",
+    "ssot_dir": ".autodev_ssot",
+    "kill_switch": ".autodev_queue/STOP",
+    "audit_events": ".autodev_queue/audit/events.ndjson"
+  },
+  "ollama": {
+    "base_url_in_compose_network": "http://ollama:11434",
+    "generate_endpoint": "/api/generate",
+    "default_model": "qwen2.5-coder:7b"
+  },
+  "guardrails": {
+    "dry_run_default": true,
+    "repo_mount_readonly": true,
+    "max_file_bytes": 120000,
+    "max_context_files": 8,
+    "require_unified_diff": true,
+    "deny_paths_glob": [
+      ".git/**",
+      ".autodev_queue/**",
+      ".autodev_ssot/**",
+      "**/*.pem",
+      "**/*.key"
+    ]
+  },
+  "roles": {
+    "claude_code": ["task_authoring", "prompt_authoring"],
+    "cursor": ["apply_patch", "run_tests", "commit", "merge", "gate_decision"],
+    "openclaw": ["read_repo", "propose_diff", "write_work_artifacts"],
+    "ollama": ["local_llm_runtime"]
+  },
+  "audit": {
+    "append_only": true,
+    "hash_alg": "sha256"
+  }
+}

@@ -20,3 +20,25 @@ Thumbs.db
 # Local / secrets (do not commit)
 *.local
 *.secret
+
+# Runtime queue (do not commit)
+.autodev_queue/
+
+# Mode B artifacts
+patches/
+
+
+# Orchestrator artifacts
+orchestrator/patches/*.patch
+orchestrator/reports/*.json
+
+
+# Runtime artifacts
+.autodev_runtime/
+logs/
+
+
+# Local import artifacts
+AUTODEV_TELEGRAM_MODEB_FULLPACK_APPROVE/
+AUTODEV_TELEGRAM_MODEB_FULLPACK_APPROVE.zip
+
