@@ -43,6 +43,8 @@
 | `docs/CLAUDE_CODE_OLLAMA_WINDOWS_RUNBOOK.md` | Windows 기준 Claude Code + Ollama 설치/연동/운영 런북 |
 | `docs/MODE_B_OPERATION_RUNBOOK.md` | Mode B(Claude=티켓+diff) 운영·Gate·allowlist |
 | `docs/WORKLOG_2026-02-15.md` | 이번 세션 작업 이력/검증 결과 |
+| `docs/WORKLOG_2026-02-16.md` | Telegram Mode B 운영 전환, Orchestrator, 2단 승인 |
+| `docs/MODE_B_TELEGRAM_AUTOMATION.md` | Telegram 2단 승인 자동화 Full Pack |
 | `docs/NEXT_PLAN.md` | 다음 단계 실행 계획 |
 | `README_AUTODEV.md` | Queue 기반 운영 절차(Worker는 diff-only, Cursor만 apply/test/commit) |
 | `config/policy/*.md` | CURSOR_RULES, TOOL_POLICY, APPROVAL_MATRIX, AUDIT_LOG_SCHEMA |
@@ -67,7 +69,7 @@
 
 ## 경로 정책(allowlist)
 
-- **허용**: `.cursor/`, `.github/`, `config/`, `tools/`, `tests/`, `pyproject.toml`, `plan.md`, `CODEOWNERS`, `README.md`, `MANIFEST.json`, `BATON_CURRENT.md`
+- **허용**: `.cursor/`, `.github/`, `config/`, `orchestrator/`, `docs/`, `tools/`, `tests/`, `pyproject.toml`, `plan.md`, `CODEOWNERS`, `README.md`, `MANIFEST.json`, `BATON_CURRENT.md`
 - UI/UX 문서의 `docs/policy/*`는 **`config/policy/*`** 로 통일.
 
 ---
@@ -78,8 +80,9 @@
 |------|------|
 | `.autodev_queue/` | Folder Queue(inbox/claimed/work/pr/done/blocked/audit, STOP) |
 | `.cursor/` | rules, commands, skills, agents, config |
-| `config/` | policy, uiux, project_profile 등 |
-| `docs/` | ARCHITECTURE, ROADMAP, INDEX(마스터 네비게이션), 스택 보고서 등 |
+| `config/` | policy, uiux, project_profile, WORK_AUTODEV_CONFIG 등 |
+| `orchestrator/` | tg_orchestrator.py, main.py, prompts, utils |
+| `docs/` | ARCHITECTURE, ROADMAP, INDEX, MODE_B_TELEGRAM, WORKLOG 등 |
 | `stack/` | RUNBOOK, NEXT_STEPS, docker-compose |
 | `tools/` | 스크립트(예: init_autodev_queue) |
 | `tests/` | 테스트 |

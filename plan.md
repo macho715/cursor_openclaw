@@ -16,6 +16,17 @@
 - [ ] CI/Pre-commit (ci.yml, .pre-commit-config.yaml, pyproject.toml)
 - [ ] DRY_RUN 검증 (pytest, pre-commit)
 
+## 완료(Pilot, 2026-02)
+- [x] Telegram Mode B Orchestrator (`tg_orchestrator.py`, `/work`, `/approve`, `/reject`)
+- [x] 2단 승인 플로우 (`cursor_apply_approved.ps1`, `.autodev_queue/approved/`)
+- [x] `docs/MODE_B_OPERATION_RUNBOOK.md`, `docs/MODE_B_TELEGRAM_AUTOMATION.md`
+- [x] `docs/WORKLOG_2026-02-16.md`
+
+## 다음 작업
+- [ ] `/approve` 이후 승인파일 기반 자동 PR 브랜치 생성(로컬만, push 금지) 옵션
+- [ ] `/work` 프롬프트 템플릿에 작업별 스키마(파일/라인 제한) 강제
+- [ ] 승인/거절 이벤트 대시보드용 audit 집계 스크립트 확장
+
 ## Stage 3 Exit 판정
 - Go: 위 항목 전부 완료 + CI/Pre-commit 통과
 - Revise: 정책/게이트/복구 책임 분리 모호
