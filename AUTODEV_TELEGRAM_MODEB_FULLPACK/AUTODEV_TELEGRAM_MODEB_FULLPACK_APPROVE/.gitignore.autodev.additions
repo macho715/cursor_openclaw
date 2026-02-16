@@ -1,0 +1,11 @@
+# AutoDev Orchestrator runtime
+.autodev_runtime/
+# Orchestrator local logs
+logs/
+# Environment secrets
+.env
+# Patch artifacts (already recommended)
+patches/
+
+# AutoDev approval flags
+.autodev_queue/approved/

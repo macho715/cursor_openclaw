@@ -23,6 +23,7 @@
 - [docs/STACK_USAGE.md](STACK_USAGE.md) - 스택 사용법 (접속 URL, 명령, openclaw-stub vs Gateway)
 - [stack/NEXT_STEPS.md](../stack/NEXT_STEPS.md) - 기동 후 작업
 - [docs/STACK_SESSION_REPORT.md](STACK_SESSION_REPORT.md) - 작업 이력·트러블슈팅
+- [docs/SESSION_WORK_REPORT.md](SESSION_WORK_REPORT.md) - 세션 작업 보고 (최근 작업 요약)
 - [config/VRAM_계산_요약.md](../config/VRAM_계산_요약.md) - VRAM 권장값
 
 ### 정책·아키텍처 담당
@@ -51,6 +52,7 @@
 | [docs/ARCHITECTURE.md](ARCHITECTURE.md) | 시스템 아키텍처 |
 | [docs/ROADMAP.md](ROADMAP.md) | 로드맵 |
 | [docs/STACK_SESSION_REPORT.md](STACK_SESSION_REPORT.md) | 스택 작업 이력·앞으로 할 일 |
+| [docs/SESSION_WORK_REPORT.md](SESSION_WORK_REPORT.md) | 세션 작업 보고 (최근 작업 요약) |
 | [docs/MODE_B_OPERATION_RUNBOOK.md](MODE_B_OPERATION_RUNBOOK.md) | Mode B(Claude=티켓+diff) 운영·Gate·allowlist |
 | [docs/MODE_B_TELEGRAM_AUTOMATION.md](MODE_B_TELEGRAM_AUTOMATION.md) | Telegram 2단 승인 자동화 Full Pack |
 | [docs/WORKLOG_2026-02-16.md](WORKLOG_2026-02-16.md) | 2026-02-16 작업 로그 (Orchestrator, /approve) |

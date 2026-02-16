@@ -1,0 +1,128 @@
+{
+  "version": "1.2.0",
+  "profile": "mode_b_tg_mvp_approve_prbranch",
+  "project": {
+    "name": "cursor_openclaw",
+    "repo_root": "C:\\Users\\jichu\\Downloads\\cursor_full_setting_optionA\\cursor_openclaw",
+    "timezone": "Asia/Dubai"
+  },
+  "telegram": {
+    "enabled": true,
+    "bot_token_env": "TG_BOT_TOKEN",
+    "allowed_chat_ids": [
+      470962761
+    ],
+    "polling": {
+      "timeout_sec": 25,
+      "interval_sec": 1
+    },
+    "commands": {
+      "work": "/work",
+      "status": "/status",
+      "stop": "/stop",
+      "resume": "/resume",
+      "help": "/help",
+      "approve": "/approve",
+      "reject": "/reject"
+    },
+    "reply": {
+      "rate_limit_sec": 2,
+      "max_chars": 3500
+    }
+  },
+  "automation": {
+    "engine": "claude_code",
+    "fallback_to_openclaw_queue": false,
+    "openclaw_wait_sec": 240,
+    "auto_stash_policy": "STOP",
+    "tests": {
+      "enabled": false,
+      "command": "",
+      "timeout_sec": 600
+    }
+  },
+  "llm": {
+    "ollama": {
+      "anthropic_base_url": "http://127.0.0.1:11434"
+    },
+    "claude_code": {
+      "enabled": true,
+      "model_primary": "kwangsuklee/SEOKDONG-llama3.1_korean_Q5_K_M:latest",
+      "model_fallbacks": [
+        "exaone3.5:7.8b"
+      ],
+      "ollama_launch_cmd": [
+        "ollama",
+        "launch",
+        "claude"
+      ],
+      "prompt_template": [
+        "You are proposing a patch only. Do not apply/save/run/commit.",
+        "DO NOT use GitHub/MCP tools or any remote tools. Use ONLY local repository context.",
+        "Do NOT invent facts, dates, names, versions, or file contents.",
+        "Output ONLY a valid unified diff. No explanations. No markdown.",
+        "The diff MUST start with: diff --git",
+        "Touched files MUST be within allowlist only.",
+        "Task: {WORK_TEXT}"
+      ]
+    }
+  },
+  "scope": {
+    "allowlist": [
+      "docs/**",
+      "scripts/**",
+      "tools/**",
+      "src/**",
+      "tests/**",
+      "README.md",
+      ".gitignore"
+    ],
+    "denylist": [
+      ".git/**",
+      ".openclaw/**",
+      ".autodev_ssot/**",
+      ".autodev_queue/**",
+      "**/*.pem",
+      "**/*.key",
+      "**/*.pfx",
+      "**/*.kdbx"
+    ]
+  },
+  "queue": {
+    "root": ".autodev_queue",
+    "inbox": ".autodev_queue/inbox",
+    "work": ".autodev_queue/work",
+    "blocked": ".autodev_queue/blocked",
+    "audit": ".autodev_queue/audit",
+    "killswitch": ".autodev_queue/STOP",
+    "approved": ".autodev_queue/approved"
+  },
+  "artifacts": {
+    "patch_dir": "patches",
+    "reports_dir": ".autodev_queue/work",
+    "runtime_dir": ".autodev_runtime",
+    "max_patch_bytes": 800000,
+    "max_report_bytes": 800000
+  },
+  "gates": {
+    "require_clean_porcelain2": true,
+    "require_git_apply_check": true,
+    "deny_new_files": true,
+    "deny_binary_patches": true
+  },
+  "report_templates": {
+    "stop_repo_dirty": "[STOP] Repo dirty (porcelain2 not clean)\n- action: clean manually (stash/commit) then retry /work\n- cwd: {repo_root}\n",
+    "stop_killswitch": "[STOP] Kill-switch detected\n- file: {killswitch}\n- action: remove STOP then /resume\n",
+    "help": "[HELP]\n/work <텍스트> : 작업 요청(제안/검증/리포트)\n/status : 큐/런타임 상태\n/approve [task_id] : 승인 플래그 생성 + PR 브랜치 포인터 생성(git branch). 자동 apply/commit/push 없음\n/reject [task_id] : 승인 플래그 삭제(옵션)\n/stop : KILL-SWITCH 생성(즉시 중단)\n/resume : KILL-SWITCH 해제\n\n원칙: 자동은 diff+검증+리포트까지만. 적용/커밋/푸시는 사람이(Cursor) 수행.\n",
+    "pass_patch_ready": "[PASS] Patch proposed\n- task_id: {task_id}\n- patch: {patch_path}\n- gate: git apply --check OK\n- next: review/apply in Cursor\n",
+    "fail_patch_invalid": "[FAIL] Patch invalid\n- task_id: {task_id}\n- reason: {reason}\n- next: refine /work text and retry\n",
+    "pass_approved": "[APPROVED] {task_id}\n- approved: {approved_path}\n- pr_branch: {pr_branch}\n- next: Cursor에서 아래 중 1개 실행\n  1) scripts\\cursor_apply_approved.ps1 -TaskId {task_id}\n  2) (수동) git checkout {pr_branch} -> git apply {patch_path}\n- push는 수동: git push -u origin {pr_branch}\n",
+    "fail_approve": "[FAIL] Approve failed\n- task_id: {task_id}\n- reason: {reason}\n"
+  },
+  "git": {
+    "create_pr_branch_on_approve": true,
+    "pr_branch_prefix": "autodev/",
+    "pr_branch_from": "HEAD",
+    "deny_if_branch_exists": false
+  }
+}
